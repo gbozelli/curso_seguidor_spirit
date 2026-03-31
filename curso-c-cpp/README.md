@@ -32,17 +32,17 @@ Ele começa pelo programa mais simples e avança para tipos, vetores, funções 
 ## Como compilar
 
 - Para C:
-  ```bash
+```bash
 gcc arquivo.c -o arquivo
-  ```
+```
 - Para C++:
-  ```bash
+```bash
 g++ arquivo.cpp -o arquivo
-  ```
+```
 - Para executar:
-  ```bash
+```bash
 ./arquivo
-  ```
+```
 
 ## Pontos importantes
 

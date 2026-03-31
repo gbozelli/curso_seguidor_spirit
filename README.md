@@ -27,15 +27,15 @@ Cada tópico tem um `README.md` com explicações, passo a passo e exemplos de c
 ## Como usar os exemplos
 
 - Em C:
-  ```bash
+```bash
 gcc arquivo.c -o arquivo
 ./arquivo
-  ```
+```
 - Em C++:
-  ```bash
+```bash
 g++ arquivo.cpp -o arquivo
 ./arquivo
-  ```
+```
 - Em Arduino:
   1. Abra o sketch no Arduino IDE ou no PlatformIO.
   2. Selecione a placa e a porta correta.
