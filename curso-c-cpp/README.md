@@ -8,6 +8,7 @@ Ele começa pelo programa mais simples e avança para tipos, vetores, funções 
 - Estrutura de um programa em C.
 - Tipos de dados básicos e variáveis.
 - Como usar arrays e strings.
+- Como trabalhar com ponteiros e referências em C.
 - Como dividir o código em funções.
 - Como usar `struct` e conceitos iniciais de orientação a objetos em C++.
 
@@ -17,9 +18,10 @@ Ele começa pelo programa mais simples e avança para tipos, vetores, funções 
 - `02-tipos-e-variaveis`: tipos primitivos, variáveis e constantes.
 - `03-arrays-e-strings`: vetores, uso de arrays de caracteres e `std::string`.
 - `04-funcoes-e-estruturas`: funções, parâmetros, retorno e `struct`.
-- `05-estruturas-de-controle`: tipos otimizados, condicionais `if/else` e laços `for`/`while`.
-- `06-orientacao-a-objetos`: classes, objetos, construtores e herança simples.
-- `07-classes-avancadas`: encapsulamento, herança, polimorfismo e projeto de classes.
+- `05-ponteiros`: ponteiros, endereços de memória, indireção e passagem por referência.
+- `06-estruturas-de-controle`: tipos otimizados, condicionais `if/else` e laços `for/while`.
+- `07-orientacao-a-objetos`: classes, objetos, construtores e herança simples.
+- `08-classes-avancadas`: encapsulamento, herança, polimorfismo e projeto de classes.
 
 ## Como estudar este módulo
 
