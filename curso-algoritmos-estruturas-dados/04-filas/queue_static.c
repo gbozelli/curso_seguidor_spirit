@@ -8,16 +8,20 @@ int front = 0;
 int rear = 0;
 int count = 0;
 
-bool is_empty(void) {
+bool is_empty(void)
+{
   return count == 0;
 }
 
-bool is_full(void) {
+bool is_full(void)
+{
   return count == MAX_QUEUE;
 }
 
-void enqueue(int value) {
-  if (is_full()) {
+void enqueue(int value)
+{
+  if (is_full())
+  {
     printf("Erro: fila cheia\n");
     return;
   }
@@ -26,8 +30,10 @@ void enqueue(int value) {
   count++;
 }
 
-int dequeue(void) {
-  if (is_empty()) {
+int dequeue(void)
+{
+  if (is_empty())
+  {
     printf("Erro: fila vazia\n");
     return -1;
   }
@@ -37,7 +43,8 @@ int dequeue(void) {
   return value;
 }
 
-int main(void) {
+int main(void)
+{
   enqueue(1);
   enqueue(2);
   enqueue(3);

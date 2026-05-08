@@ -2,27 +2,33 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct StackNode {
+typedef struct StackNode
+{
   int value;
   struct StackNode *next;
 } StackNode;
 
 StackNode *top = NULL;
 
-bool is_empty(void) {
+bool is_empty(void)
+{
   return top == NULL;
 }
 
-void push(int value) {
+void push(int value)
+{
   StackNode *node = malloc(sizeof(StackNode));
-  if (node == NULL) return;
+  if (node == NULL)
+    return;
   node->value = value;
   node->next = top;
   top = node;
 }
 
-int pop(void) {
-  if (is_empty()) {
+int pop(void)
+{
+  if (is_empty())
+  {
     printf("Erro: pilha vazia\n");
     return -1;
   }
@@ -33,21 +39,26 @@ int pop(void) {
   return value;
 }
 
-int peek(void) {
-  if (is_empty()) {
+int peek(void)
+{
+  if (is_empty())
+  {
     printf("Erro: pilha vazia\n");
     return -1;
   }
   return top->value;
 }
 
-void free_stack(void) {
-  while (!is_empty()) {
+void free_stack(void)
+{
+  while (!is_empty())
+  {
     pop();
   }
 }
 
-int main(void) {
+int main(void)
+{
   push(5);
   push(15);
   push(25);

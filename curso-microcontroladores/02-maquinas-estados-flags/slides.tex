@@ -1,0 +1,103 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Máquinas de Estado e Flags}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{O problema com `delay()`}
+  \begin{itemize}
+    \item `delay()` é bastante utilizado quando precisamos esperar para fazer uma ação.
+    \item Porém, `delay()` bloqueia o `loop()` e paralisa o programa.
+    \item Com o programa paralisado, você perde o controle sobre variáveis, funções e etc.
+    \item Uma máquina de estado pode deixar o `loop()` sempre rodando, mas também mudar uma ação após um determinado tempo.
+    \item É essencial no seguidor, pois os sensores sempre precisam estar funcionando para a tomada de decisão.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Definindo estados com `enum`}
+\begin{lstlisting}
+enum Estado {
+  PARADO,
+  ANDANDO
+};
+
+Estado estadoAtual = PARADO;
+bool mudou = false;
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `enum` cria um tipo com nomes simbólicos.
+    \item Muito mais legível que usar números (0, 1, 2...).
+    \item `mudou` é a flag que controla transições.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Como usar no `loop()`}
+\begin{lstlisting}
+void loop() {
+  if (!mudou) {
+    if (estadoAtual == PARADO) {
+      estadoAtual = ANDANDO;
+      digitalWrite(LED_PIN, HIGH);
+      mudou = true;
+    }
+  }
+  delay(1000);
+  mudou = false;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Entendendo a lógica}
+  \begin{itemize}
+    \item `if (!mudou)` verifica se já mudou de estado.
+    \item Dentro, você executa a ação correspondente ao estado.
+    \item `mudou = true` marca que a transição aconteceu.
+    \item No fim do `loop()`, `mudou` volta a `false` para a próxima oportunidade.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Vantagem para robôs}
+  \begin{itemize}
+    \item O `loop()` roda sempre, sensores são lidos continuamente.
+    \item Estados definem claramente o que o robô está fazendo.
+    \item Fácil adicionar novas transições e comportamentos.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Próximos passos}
+  \begin{itemize}
+    \item Teste o código com um LED que liga/desliga.
+    \item Adicione um terceiro estado: `RETORNANDO`.
+    \item Use um botão para controlar as transições de estado.
+    \item Estude `millis()` para temporizações sem bloquear.
+  \end{itemize}
+\end{frame}
+
+\end{document}

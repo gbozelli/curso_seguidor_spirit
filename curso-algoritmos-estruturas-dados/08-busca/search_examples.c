@@ -1,31 +1,42 @@
 #include <stdio.h>
 
-int linear_search(int a[], int n, int target) {
-  for (int i = 0; i < n; i++) {
-    if (a[i] == target) {
+int linear_search(int a[], int n, int target)
+{
+  for (int i = 0; i < n; i++)
+  {
+    if (a[i] == target)
+    {
       return i;
     }
   }
   return -1;
 }
 
-int binary_search(int a[], int n, int target) {
+int binary_search(int a[], int n, int target)
+{
   int left = 0;
   int right = n - 1;
-  while (left <= right) {
+  while (left <= right)
+  {
     int middle = left + (right - left) / 2;
-    if (a[middle] == target) {
+    if (a[middle] == target)
+    {
       return middle;
-    } else if (a[middle] < target) {
+    }
+    else if (a[middle] < target)
+    {
       left = middle + 1;
-    } else {
+    }
+    else
+    {
       right = middle - 1;
     }
   }
   return -1;
 }
 
-int main(void) {
+int main(void)
+{
   int data[] = {2, 4, 6, 8, 10, 12};
   int n = sizeof(data) / sizeof(data[0]);
 

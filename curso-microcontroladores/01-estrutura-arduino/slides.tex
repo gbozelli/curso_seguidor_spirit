@@ -1,0 +1,96 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Estrutura Arduino}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{O que é um sketch?}
+  \begin{itemize}
+    \item O sketch é o programa que roda no Arduino.
+    \item Ele começa em `setup()` e continua em `loop()`.
+    \item `setup()` é executado apenas uma vez após ligar a placa.
+    \item `loop()` repete muitas vezes por segundo.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Estrutura básica}
+\begin{lstlisting}
+const int LED_PIN = 13;
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(LED_PIN, HIGH);
+  delay(500);
+  digitalWrite(LED_PIN, LOW);
+  delay(500);
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{O que cada linha faz}
+  \begin{itemize}
+    \item `const int LED_PIN = 13;` define uma constante com o número do pino.
+    \item `pinMode()` prepara o pino como saída (`OUTPUT`).
+    \item `digitalWrite(pin, HIGH)` liga o pino (5V).
+    \item `digitalWrite(pin, LOW)` desliga o pino (0V).
+    \item `delay(ms)` pausa o programa em milissegundos.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{O pino 13}
+  \begin{itemize}
+    \item O pino 13 tem um LED incorporado na maioria das placas.
+    \item Você não precisa de componentes adicionais para testar.
+    \item Mas qualquer pino digital pode ser usado.
+    \item Lembre-se de conectar resistor se usar pino externo.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Erros comuns}
+  \begin{itemize}
+    \item `delay()` bloqueia tudo, use para testes apenas.
+    \item Não esqueça o resistor (220-1000 Ohms) com LED externo.
+    \item Verifique a placa e porta no Arduino IDE.
+    \item Use `const` para valores fixos, fica mais legível.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Próximos passos}
+  \begin{itemize}
+    \item Teste o código acima na sua placa.
+    \item Mude o tempo de `delay()` e observe.
+    \item Adicione mais LEDs em pinos diferentes.
+    \item Na aula seguinte veremos como evitar `delay()` com máquinas de estado.
+  \end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,113 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\setbeamertemplate{navigation symbols}{}
+
+\title{Seguidor de Linha}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Introdução}
+  \begin{itemize}
+    \item Um seguidor de linha é um robô que segue uma pista no chão.
+    \item O robô lê a linha com sensores, processa a informação e ajusta os motores.
+    \item O objetivo é permanecer sobre a linha e seguir seu trajeto.
+    \item É um robô autônomo que se desloca sobre um caminho marcado.
+    \item A pista é uma linha branca em fundo escuro.
+    \item A ideia central é detectar a linha e corrigir a direção.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Ideia básica}
+  \begin{itemize}
+    \item Use um número ímpar de sensores.
+    \item O sensor central deve sempre ler a linha branca.
+    \item Se um sensor lateral ler a linha, o motor oposto deve ganhar mais velocidade.
+
+    \item Pode ficar instável em curvas mais fechadas.
+    \item Ruídos nos sensores podem gerar comandos opostos, porque a leitura é binária.
+    \item O robô tende a fazer ajustes bruscos, não suaves.
+  \end{itemize}
+  \vspace{0.4cm}
+  Por isso usamos um controle melhor, como PID.
+\end{frame}
+
+\begin{frame}{PID}
+  PID é uma técnica de controle que melhora o ajuste do robô.
+
+  \begin{itemize}
+    \item \textbf{Proporcional (P)}: corrige com base no erro atual.
+    \item \textbf{Integral (I)}: corrige com base no histórico do erro.
+    \item \textbf{Derivativo (D)}: corrige com base na velocidade do erro.
+  \end{itemize}
+
+  \pause
+
+  No seguidor de linha, o PID ajuda a fazer curvas suaves e manter o robô na pista.
+\end{frame}
+
+\begin{frame}{Divisão do seguidor}
+  O seguidor de linha tem três partes principais e uma extra:
+  \begin{itemize}
+    \item Sensores
+    \item Microcontrolador
+    \item Motores
+    \item PCB (parte extra)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Sensores}
+  \begin{itemize}
+    \item Os sensores são a entrada do robô.
+    \item Eles detectam a linha no chão e enviam a informação ao micro.
+    \item Sensores e ESP32 exigem conhecimento de microcontrolador e eletrônica.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Microcontrolador}
+  \begin{itemize}
+    \item O micro é onde tudo acontece.
+    \item Ele lê os sensores, aplica a lógica e gera comandos para os motores.
+    \item O ESP32 calcula o PID e decide a velocidade de cada roda.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Motores}
+  \begin{itemize}
+    \item Os motores são a saída do sistema.
+    \item Eles transformam o sinal elétrico em movimento.
+    \item A ponte H permite controlar direção e velocidade.
+    \item Essa parte envolve eletrônica e mecânica.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Parte extra: PCB}
+  \begin{itemize}
+    \item A PCB organiza os componentes eletrônicos.
+    \item Ela envolve mais design do que programação.
+    \item Um bom projeto de PCB deixa a montagem mais fácil. E pode evitar que o seguidor seja muito frágil (tanto em termos eletrônicos quanto mecânicos)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Resumo}
+  \begin{itemize}
+    \item Sensores leem a pista.
+    \item Micros processam e calculam os ajustes.
+    \item Motores movem o robô.
+    \item PCB organiza o hardware.
+    \item PID melhora o controle e torna o seguidor mais suave.
+  \end{itemize}
+\end{frame}
+
+\end{document}

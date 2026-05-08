@@ -1,0 +1,140 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},\n  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Controle PID para Seguidor}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{O problema sem PID}
+  \begin{itemize}
+    \item Abordagem simples: se desvia, vira para um lado.
+    \item Resultado: robô oscila muito, zigzagueia.
+    \item Pode sair completamente da linha em curvas rápidas.
+    \item Sensível a ruído dos sensores.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{O que é PID?}
+  \begin{itemize}
+    \item PID = Proporcional + Integral + Derivativo.
+    \item É um controlador que faz ajustes suaves.
+    \item Minimiza oscilação e erro de posição.
+    \item Essencial em robótica.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{P - Proporcional}
+  \begin{itemize}
+    \item Corrige proporcionalmente ao erro atual.
+    \item Quanto maior o erro, maior a correção.
+    \item Exemplo: se está muito desviado, vira bastante.
+    \item Se está pouco desviado, vira pouco.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{I - Integral}
+  \begin{itemize}
+    \item Acumula o erro ao longo do tempo.
+    \item Corrige desvios sistemáticos persistentes.
+    \item Se o robô fica sempre um pouco para a esquerda, integral corrige.
+    \item Evita que o robô pare no meio da linha.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{D - Derivativo}
+  \begin{itemize}
+    \item Detecta a velocidade de mudança do erro.
+    \item Amortece oscilações rápidas.
+    \item Se o erro está crescendo rápido, reduz a correção.
+    \item Deixa o movimento mais suave.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Fórmula básica do PID}
+\begin{lstlisting}
+// P: Proporcional
+float P = erro * Kp;
+
+// I: Integral (acumula ao longo do tempo)
+integral += erro;
+float I = integral * Ki;
+
+// D: Derivativo (taxa de mudança)
+float D = (erro - erro_anterior) * Kd;
+
+// Sinal de controle final
+float sinal = P + I + D;
+erro_anterior = erro;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Como ajustar PID}
+  \begin{itemize}
+    \item `Kp`: comece com valor pequeno, aumenta até oscilação.
+    \item `Kd`: reduz oscilação, aumenta até ficar lento.
+    \item `Ki`: última coisa a ajustar, pode desestabilizar.
+    \item Processo: teste, observe, ajuste, repita.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exemplo simplificado em Arduino}
+\begin{lstlisting}
+float Kp = 0.1, Ki = 0.01, Kd = 0.05;
+float integral = 0, erro_anterior = 0;
+
+void loop() {
+  int leitura = analogRead(SENSOR_CENTRO);
+  float erro = leitura - 512;  // 512 é centro
+  
+  float P = erro * Kp;
+  integral += erro;
+  float I = integral * Ki;
+  float D = (erro - erro_anterior) * Kd;
+  
+  float sinal = P + I + D;
+  erro_anterior = erro;
+  
+  // Aplicar sinal aos motores
+  int velocidade_esq = 150 - sinal;
+  int velocidade_dir = 150 + sinal;
+  
+  analogWrite(MOTOR_ESQ, velocidade_esq);
+  analogWrite(MOTOR_DIR, velocidade_dir);
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Por que PID?}
+  \begin{itemize}
+    \item Controle automático e robusto.
+    \item Funciona mesmo com variações de velocidade.
+    \item Fácil de entender e implementar.
+    \item Padrão na indústria de robótica.
+  \end{itemize}
+\end{frame}
+
+\end{document}

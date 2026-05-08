@@ -1,0 +1,114 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Bibliotecas Comuns}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{O que é uma biblioteca?}
+  \begin{itemize}
+    \item Código pronto para usar de novo e de novo.
+    \item Implementa funções complexas de forma simples.
+    \item Economiza tempo e reduz erros.
+    \item Arduino vem com muitas bibliotecas prontas.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Incluindo uma biblioteca}
+\begin{lstlisting}
+#include <Servo.h>
+#include <Wire.h>
+#include <LiquidCrystal.h>
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `#include` traz a biblioteca para o seu sketch.
+    \item Use `<...>` para bibliotecas do sistema.
+    \item Use `\"...\"` para bibliotecas locais.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Biblioteca Servo - exemplo}
+\begin{lstlisting}
+#include <Servo.h>
+
+Servo meuServo;
+const int PINO_SERVO = 9;
+
+void setup() {
+  meuServo.attach(PINO_SERVO);
+}
+
+void loop() {
+  meuServo.write(0);   // 0 graus
+  delay(1000);
+  meuServo.write(90);  // 90 graus
+  delay(1000);
+  meuServo.write(180); // 180 graus
+  delay(1000);
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Biblioteca Servo - uso na prática}
+  \begin{itemize}
+    \item `attach()` conecta o servo a um pino com PWM.
+    \item `write()` define o ângulo em graus (0-180).
+    \item Servo controlado por pulsos, a biblioteca gerencia tudo.
+    \item Essencial para projetos com braços robóticos.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Outras bibliotecas importantes}
+  \begin{itemize}
+    \item `Wire`: I2C para sensores IMU, acelerômetro, etc.
+    \item `SPI`: comunicação rápida com cartão SD, display.
+    \item `LiquidCrystal`: controla displays LCD de 16x2.
+    \item `Adafruit_*`: bibliotecas específicas de sensores.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Como encontrar e instalar}
+  \begin{itemize}
+    \item Arduino IDE tem Sketch > Include Library > Manage Libraries.
+    \item Procure por nome da biblioteca ou do sensor.
+    \item Exemplos vêm junto com a instalação.
+    \item Leia o arquivo README para instruções.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Estruturando código com bibliotecas}
+  \begin{itemize}
+    \item Separe lógica de sensores em funções simples.
+    \item Use classes para agrupar comportamento (objeto-orientado).
+    \item Mantenha sketch principal limpo e organizado.
+    \item Comente o que cada função faz.
+  \end{itemize}
+\end{frame}
+
+\end{document}

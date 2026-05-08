@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 
-int main() {
+int main()
+{
   char nome_c[10] = "Spirit";
   char apresentacao[20] = "Curso C++";
 

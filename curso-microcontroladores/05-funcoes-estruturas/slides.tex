@@ -1,0 +1,147 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Funções e Estruturas em C++}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}[fragile]{O que é uma função?}
+\begin{lstlisting}
+int somar(int a, int b) {
+  return a + b;
+}
+
+void setup() {
+  int resultado = somar(5, 3);
+  // resultado agora é 8
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Função é um bloco de código reutilizável.
+    \item `int somar(...)` retorna um inteiro.
+    \item `void` significa que não retorna nada.
+    \item Parâmetros passam dados para a função.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Funções sem retorno}
+\begin{lstlisting}
+void piscarLED(int vezes) {
+  for (int i = 0; i < vezes; i++) {
+    digitalWrite(LED_PIN, HIGH);
+    delay(500);
+    digitalWrite(LED_PIN, LOW);
+    delay(500);
+  }
+}
+
+void loop() {
+  piscarLED(3);  // pisca 3 vezes
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `void` não retorna nada, apenas executa.
+    \item Ótimo para ações repetitivas.
+    \item Deixa o código mais organizado e legível.
+  \end{itemize}\n\\end{frame}
+
+\begin{frame}[fragile]{Funções que retornam valores}
+\begin{lstlisting}
+float lerTemperatura() {
+  int leitura = analogRead(TEMP_PIN);
+  float temp = (leitura / 1023.0) * 100;
+  return temp;
+}
+
+void loop() {
+  float temperatura = lerTemperatura();
+  Serial.println(temperatura);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \\item `return` envia um valor de volta.
+    \\item Tipo deve corresponder (float retorna float).
+    \\item Resultado pode ser armazenado em variável.
+  \\end{itemize}
+\\end{frame}
+
+\\begin{frame}[fragile]{Estrutura simples em C++}
+\\begin{lstlisting}
+struct Motor {
+  int pino;
+  int velocidade;
+};
+
+void setup() {
+  Motor motor1;
+  motor1.pino = 9;
+  motor1.velocidade = 200;
+  analogWrite(motor1.pino, motor1.velocidade);
+}
+\\end{lstlisting}
+
+  \\begin{itemize}
+    \\item `struct` agrupa dados relacionados.
+    \\item Acessa dados com `.` (ponto).
+    \\item Deixa código mais organizado quando há vários dados.
+  \\end{itemize}
+\\end{frame}
+
+\\begin{frame}[fragile]{Função que recebe uma estrutura}
+\\begin{lstlisting}
+struct Sensor {
+  int pino;
+  float valor;
+};
+
+float lerSensor(Sensor s) {
+  s.valor = analogRead(s.pino);
+  return s.valor / 1023.0 * 100;
+}
+
+void loop() {
+  Sensor temperatura;
+  temperatura.pino = A0;
+  float temp = lerSensor(temperatura);
+}
+\\end{lstlisting}
+\\end{frame}
+
+\\begin{frame}{Vantagens de usar funções e estruturas}
+  \\begin{itemize}
+    \\item Código fica reutilizável e organizado.
+    \\item Fácil de testar cada parte isoladamente.
+    \\item Menos chance de cometer erros.
+    \\item Em projetos maiores, essencial para manutenção.
+  \\end{itemize}
+\\end{frame}
+
+\\end{document}

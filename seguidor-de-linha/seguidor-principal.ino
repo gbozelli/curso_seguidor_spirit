@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <QTRSensors.h>
 #include "BluetoothSerial.h"
@@ -157,7 +158,7 @@ void loop()
     return;
   }
 
-  if (start)
+  if (start == true)
   {
     calcularPID();
     if (num_stops > 0)

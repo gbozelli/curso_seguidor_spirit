@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int main(void) {
+int main(void)
+{
   int valores[5] = {10, 20, 30, 40, 50};
   float temperaturas[4] = {21.5f, 22.0f, 22.7f, 21.9f};
   double distancias[3] = {1.234, 2.345, 3.456};
@@ -8,7 +9,8 @@ int main(void) {
 
   valores[2] = 35;
 
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++)
+  {
     printf("valores[%d] = %d\n", i, valores[i]);
   }
 
@@ -17,9 +19,12 @@ int main(void) {
   printf("letras: %s\n", letras);
 
   int indice = 5;
-  if (indice >= 0 && indice < 5) {
+  if (indice >= 0 && indice < 5)
+  {
     printf("valores[%d] = %d\n", indice, valores[indice]);
-  } else {
+  }
+  else
+  {
     printf("Erro: índice %d fora do limite\n", indice);
   }
 

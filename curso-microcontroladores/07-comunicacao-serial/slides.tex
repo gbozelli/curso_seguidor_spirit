@@ -1,0 +1,154 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Comunicação Serial}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{O que é comunicação serial?}
+  \begin{itemize}
+    \item Forma de enviar dados entre Arduino e computador.
+    \item Usa 1 pino RX (recebe) e 1 pino TX (transmite).
+    \item Velocidade padrão: 9600 baud.
+    \item Essencial para debug e monitoramento.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Inicializando comunicação}
+\begin{lstlisting}
+void setup() {
+  Serial.begin(9600);  // Inicia serial a 9600 baud
+  Serial.println("Sistema iniciado!");
+}
+
+void loop() {
+  Serial.print("Valor: ");
+  Serial.println(analogRead(A0));
+  delay(1000);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `Serial.begin()` inicia a comunicação.
+    \item Deve ser chamado em `setup()`.
+    \item Velocidade deve ser a mesma do monitor.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Funções Serial comuns}
+  \begin{itemize}
+    \item `Serial.print()`: imprime sem quebra de linha.
+    \item `Serial.println()`: imprime com quebra de linha.
+    \item `Serial.write()`: envia um byte bruto.
+    \item `Serial.read()`: lê um byte do computador.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Monitorando sensores}
+\begin{lstlisting}
+void loop() {
+  int sensor1 = analogRead(A0);
+  int sensor2 = analogRead(A1);
+  int sensor3 = analogRead(A2);
+  
+  Serial.print("Sensores: ");
+  Serial.print(sensor1);
+  Serial.print(", ");
+  Serial.print(sensor2);
+  Serial.print(", ");
+  Serial.println(sensor3);
+  
+  delay(100);
+}
+\end{lstlisting}
+
+  Abra o Monitor Serial no Arduino IDE (Ctrl+Shift+M) para ver os valores.
+\end{frame}
+
+\begin{frame}[fragile]{Recebendo dados do computador}
+\begin{lstlisting}
+void loop() {
+  if (Serial.available() > 0) {
+    char comando = Serial.read();
+    
+    if (comando == 'L') {
+      digitalWrite(LED_PIN, HIGH);
+    } else if (comando == 'D') {
+      digitalWrite(LED_PIN, LOW);
+    }
+  }
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `Serial.available()` verifica se há dados.
+    \item `Serial.read()` pega um byte.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Debug em tempo real}
+  \begin{itemize}
+    \item Mostre valores de sensores regularmente.
+    \item Indique quando estados mudam.
+    \\item Facilita encontrar problemas rapidamente.
+    \\item Não deixe muitos `println()` no código final (fica lento).
+  \\end{itemize}
+\\end{frame}
+
+\\begin{frame}[fragile]{Dica: formatar saída}
+\\begin{lstlisting}
+void loop() {
+  int valor = analogRead(A0);
+  
+  // Mostrar em diferentes formatos
+  Serial.print("Dec: ");
+  Serial.print(valor);
+  Serial.print(", Hex: ");
+  Serial.print(valor, HEX);
+  Serial.print(", Bin: ");
+  Serial.println(valor, BIN);
+}
+\\end{lstlisting}
+
+  \\begin{itemize}
+    \\item `DEC`: decimal (padrão)
+    \\item `HEX`: hexadecimal
+    \\item `BIN`: binário
+  \\end{itemize}
+\\end{frame}
+
+\\begin{frame}{Importante para o seguidor}
+  \\begin{itemize}
+    \\item Monitore leitura dos sensores continuamente.
+    \\item Veja valores do PID em tempo real.
+    \\item Teste antes de rodar o robô na linha.
+    \\item Serial é ferramenta de desenvolvimento, não coloque no código final otimizado.
+  \\end{itemize}
+\\end{frame}
+
+\\end{document}

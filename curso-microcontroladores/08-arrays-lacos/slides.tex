@@ -1,0 +1,162 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Arrays e Laços}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}[fragile]{O que é um array?}
+\begin{lstlisting}
+int sensores[5];  // Array de 5 inteiros
+sensores[0] = 100;
+sensores[1] = 200;
+sensores[2] = 150;
+// ... e assim por diante
+
+for (int i = 0; i < 5; i++) {
+  Serial.println(sensores[i]);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Array é uma lista de valores do mesmo tipo.
+    \item Índice começa em 0.
+    \item Declarar: `tipo nome[tamanho];`
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Arrays de sensores do seguidor}
+\begin{lstlisting}
+const int NUM_SENSORES = 5;
+int pinsSensores[NUM_SENSORES] = {
+  A0, A1, A2, A3, A4
+};
+int leituras[NUM_SENSORES];
+
+void lerSensores() {
+  for (int i = 0; i < NUM_SENSORES; i++) {
+    leituras[i] = analogRead(pinsSensores[i]);
+    Serial.print(leituras[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Tipos de laço}
+  \begin{itemize}
+    \item `for`: quando sabe quantas vezes repetir.
+    \item `while`: enquanto uma condição for verdadeira.
+    \item `do...while`: executa pelo menos uma vez.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Laço for}
+\begin{lstlisting}
+// Forma clássica
+for (int i = 0; i < 10; i++) {
+  Serial.println(i);
+}
+
+// Forma com array
+int valores[] = {10, 20, 30, 40, 50};
+for (int i = 0; i < 5; i++) {
+  Serial.println(valores[i]);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Inicialização, condição, incremento.
+    \item Ótimo para percorrer arrays.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Laço while}
+\begin{lstlisting}
+int contador = 0;
+while (contador < 5) {
+  Serial.println(contador);
+  contador++;
+}
+
+// Aguardar dado serial
+while (Serial.available() == 0) {
+  delay(100);
+}
+char comando = Serial.read();
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Inicializando array}
+\begin{lstlisting}
+// Forma 1: com valores explícitos
+int valores[5] = {1, 2, 3, 4, 5};
+
+// Forma 2: sem especificar tamanho
+int valores[] = {10, 20, 30, 40};
+
+// Forma 3: só declarar (valores são 0 ou lixo)
+int sensores[8];
+
+// Forma 4: iniciar todos com 0
+int contador[10] = {0};
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Aplicação no seguidor}
+  \begin{itemize}
+    \item Use array para guardar leitura de múltiplos sensores.
+    \item Processe cada sensor com laço.
+    \item Calcule erro médio ou ponderado.
+    \item Muito mais eficiente que variáveis individuais.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exemplo completo}
+\begin{lstlisting}
+const int NUM_SENSORES = 5;
+int pinsSensores[] = {A0,A1,A2,A3,A4};
+int leituras[NUM_SENSORES];
+
+void setup() {
+  for (int i = 0; i < NUM_SENSORES; i++) {
+    pinMode(pinsSensores[i], INPUT);
+  }
+}
+
+void loop() {
+  for (int i = 0; i < NUM_SENSORES; i++) {
+    leituras[i] = analogRead(pinsSensores[i]);
+  }
+  // Agora processe as leituras com PID...
+}
+\end{lstlisting}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,135 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Tipos e Variáveis em C++}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}[fragile]{Tipos de dados básicos}
+\begin{lstlisting}
+int contador = 0;      // inteiro
+float temperatura = 25.5f;  // número com decimal
+char letra = 'A';      // um caractere
+bool ligado = true;    // verdadeiro/falso
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `int`: inteiros, de -32768 a 32767 (em Arduino).
+    \item `float`: números decimais, menos preciso que `double`.
+    \item `char`: um único caractere entre apóstrofos.
+    \item `bool`: apenas `true` ou `false`.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Constantes em Arduino}
+\begin{lstlisting}
+const int LED_PIN = 13;
+const float PI = 3.14159f;
+const char LETRA_A = 'A';
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  // LED_PIN não pode mudar depois
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `const` impede que o valor mude depois.
+    \item Maior clareza no código.
+    \item Economiza memória (armazenado em Flash, não em RAM).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Tipos otimizados}
+\begin{lstlisting}
+byte sensorValue = 0;    // 0-255
+unsigned int leitura = analogRead(A0);
+long tempo = millis();   // inteiro grande
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `byte`: 0 a 255, usa menos memória que `int`.
+    \item `unsigned int`: positivos apenas.
+    \item `long`: inteiro muito grande para valores de tempo.
+    \item Em sistemas embarcados, otimizar tipo é essencial.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Variáveis globais e locais}
+\begin{lstlisting}
+int contadorGlobal = 0;  // acessível em todo sketch
+
+void setup() {
+  int valorLocal = 10;   // só dentro de setup()
+  contadorGlobal = 100;
+}
+
+void loop() {
+  // valorLocal não existe aqui!
+  // mas contadorGlobal sim
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Globais: declaradas fora de funções, acessíveis em qualquer lugar.
+    \item Locais: dentro de funções, desaparecem quando função termina.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exemplo prático: sensor de temperatura}
+\begin{lstlisting}
+const int TEMP_PIN = A1;
+float temperatura = 0;
+bool alerta = false;
+
+void loop() {
+  int leitura = analogRead(TEMP_PIN);
+  // Converter leitura (0-1023) para graus
+  temperatura = (leitura / 1023.0) * 100;
+  
+  if (temperatura > 30.0) {
+    alerta = true;
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    alerta = false;
+    digitalWrite(LED_PIN, LOW);
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Por que entender tipos?}
+  \begin{itemize}
+    \item Arduino tem memória limitada, cada byte importa.
+    \item Tipo errado pode causar comportamento inesperado.
+    \item Conversão entre tipos é necessária frequentemente.
+    \item Variáveis globais devem ser usadas com cuidado em projetos maiores.
+  \end{itemize}
+\end{frame}
+
+\end{document}
