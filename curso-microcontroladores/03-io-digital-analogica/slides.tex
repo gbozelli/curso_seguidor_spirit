@@ -73,8 +73,18 @@
     \item Mas como entender PWM afeta no uso do `analogWrite()`, se ele mesmo já faz isso para mim?
     \item O `analogWrite()` é uma função de alto nível que abstrai o controle do PWM, mas entender o que acontece por baixo dos panos é fundamental.
     \item Por exemplo, se eu tiver um problema envolvendo o motor, saber que o PWM é uma onda retangular me ajuda a diagnosticar se o problema é no sinal de controle ou no motor em si.
-    \item A saída de pinos PWM no osciloscópio não mostram uma tensão variável, mas sim uma onda retangular com largura de pulso variável. Se o motor não estiver respondendo como esperado, pode ser necessário verificar se o sinal PWM está correto.
-    \item Mas se a saída é PWM, como ocorre essa transformação para o sinal semi-analógico que o motor recebe? O motor tem uma inércia mecânica que faz com que ele responda à média do sinal PWM ao longo do tempo. Quanto maior o ciclo de trabalho, mais tempo o motor recebe energia, e mais rápido ele gira. Quanto menor o ciclo de trabalho, menos energia é fornecida, e o motor gira mais lentamente.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Por que é importante entender o PWM para microcontroladores?}
+  \begin{itemize}
+    \item Mas se a saída é PWM, como ocorre essa transformação para o sinal semi-analógico que o motor recebe? 
+    \item Quando o PWM envia um pulso HIGH, a corrente sobe gradualmente. Quando o sinal vai para LOW, a energia armazenada no campo magnético da bobina faz a corrente continuar fluindo por um breve momento.
+    \item Isso transforma a onda quadrada de tensão em uma onda triangular de vários 'degraus'
+    \item Ou seja, o sinal não sai pronto do microcontrolador. A menos que o equipamento tenha algo que transforme a onda PWM em analógica (bobinas, circuito buck), será necessário montar um circuito para isso
+    \item Curiosamente, LEDs funcionam com PWM por um efeito chamado dimerização
+    
   \end{itemize}
 \end{frame}
 
@@ -157,7 +167,7 @@ ledcWrite(pino_motor, 200);  // valor 0-255
   \begin{itemize}
     \item \textbf{Frequência}: quanto mais alta, menos ruído (mas mais consumo).
     \item Frequência >10kHz: imperceptível, ótimo para motores.
-    \item Frequência <1kHz: visível a olho nu (LED piscando).
+    \item Frequência <10Hz: visível a olho nu (LED piscando).
     \item \textbf{Resolução}: quantos bits para precisão do duty cycle.
     \item 8 bits (0-255): adequado para a maioria dos motores.
     \item 10 bits (0-1023): controle mais fino se necessário.

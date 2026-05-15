@@ -1,0 +1,288 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\setbeamertemplate{navigation symbols}{}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\title{Compra de Componentes e Datasheets}
+\subtitle{Curso de Microcontroladores}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Por que essa aula é importante?}
+  \begin{itemize}
+    \item Antes de começar a programar, você precisa entender os componentes que vai usar.
+    \item Muitos problemas em projetos eletrônicos vêm da \textbf{escolha errada do componente}.
+    \item Nem todo sensor GPS é igual. Nem todo motor funciona da mesma forma.
+    \item Saber ler um datasheet e entender especificações economiza tempo e dinheiro.
+    \item Aprenderemos a identificar um bom fornecedor, fazer perguntas corretas e evitar armadilhas comuns.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Onde comprar componentes eletrônicos?}
+  \begin{itemize}
+    \item \textbf{Nacionais}: Eletrogate, Robocore, Filipeflop, UFPA Store.
+    \item \textbf{Internacionais}: AliExpress, Ebay, Amazon (mais barato, mas demora).
+    \item \textbf{Diretos}: Distribuição oficial (mais caro, mas garantido).
+    \item Considere: preço, tempo de entrega, política de devolução, reputação do vendedor.
+    \item Não compre apenas pelo preço mais baixo! Um componente ruim pode destruir seu projeto.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{O que é um Datasheet?}
+  \begin{itemize}
+    \item Um \textbf{datasheet} é o documento técnico oficial do fabricante de um componente.
+    \item Contém todas as especificações, diagramas, pinagem, requisitos de tensão, corrente máxima, etc.
+    \item Está \textbf{sempre disponível gratuitamente} na internet (basta procurar pelo modelo).
+    \item Exemplo: procure por ``MPU-9250 datasheet PDF'' no Google e você encontrará o documento oficial.
+    \item Se não encontrar o datasheet, \textbf{desconfie} do componente. Pode ser falsificado ou descontinuado.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Por que ler o Datasheet?}
+  \begin{itemize}
+    \item \textbf{Pinagem}: qual pino é VCC, GND, SDA, SCL, etc.
+    \item \textbf{Tensão de operação}: funciona em 3.3V ou precisa de 5V?
+    \item \textbf{Corrente máxima}: quanto de corrente o componente consome?
+    \item \textbf{Protocolos}: usa I2C, SPI, UART ou comunicação digital simples?
+    \item \textbf{Especificações técnicas}: precisão, faixa de operação, temperatura máxima, etc.
+    \item Sem essas informações, você não consegue conectar o componente corretamente.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Exemplo: Sensor de Temperatura BMP280}
+  \begin{itemize}
+    \item \textbf{Precisão de Altitude}: ~0.13m.
+    \item \textbf{Faixa de Pressão}: 300-1100 hPa.
+    \item \textbf{Interface}: SPI ou I2C.
+    \item \textbf{Tensão de Operação}: 1.7V-3.6V (compatível com 3.3V).
+    \item Do datasheet aprendemos que:
+    \begin{itemize}
+      \item Funciona com microcontroladores de 3.3V como ESP32.
+      \item Usa protocolo I2C (fácil de usar).
+      \item Não consome muita corrente (ideal para sistemas embarcados).
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Exemplo: Sensor de Distância Ultrassônico}
+  \begin{itemize}
+    \item Datasheet nos diz:
+    \begin{itemize}
+      \item Faixa: 2cm a 400cm.
+      \item Ângulo de detecção: 15°.
+      \item Tempo de resposta: ~60ms.
+      \item Pino TRIG (entrada, HIGH por 10µs para disparar).
+      \item Pino ECHO (saída, recebe duração do pulso).
+    \end{itemize}
+    \item Sem essas informações, você não saberia como conectar ou programar o sensor.
+    \item Com o datasheet, fica claro exatamente o que fazer.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Módulos vs Componentes Brutos}
+  \begin{itemize}
+    \item \textbf{Componente bruto}: chip isolado (ex: chip MPU-9250 puro).
+    \begin{itemize}
+      \item Mais barato, mas exige solda e conhecimento avançado.
+      \item Requer circuito de suporte (resistores, capacitores).
+    \end{itemize}
+    \item \textbf{Módulo}: componente + PCB + circuito de suporte (ex: GY-9250).
+    \begin{itemize}
+      \item Mais caro, mas muito mais fácil de usar.
+      \item Vem com fios prontos (geralmente).
+      \item Ideal para iniciantes.
+    \end{itemize}
+    \item \textbf{Dica}: para começar, sempre compre módulos. Quando tiver experiência, considere componentes brutos.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Tensão de Operação: 3.3V vs 5V}
+  \begin{itemize}
+    \item Microcontroladores como Arduino tradicional: 5V.
+    \item ESP32, ESP8266: 3.3V.
+    \item \textbf{Cuidado}: conectar um sensor de 3.3V em 5V pode queimá-lo!
+    \item \textbf{Solução}: usar divisor de tensão ou nível shifter.
+    \item Sempre verifique a tensão no datasheet antes de comprar.
+    \item Componentes de 3.3V são mais comuns em sensores modernos.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Corrente: O que é e por que importa?}
+  \begin{itemize}
+    \item Cada componente consome uma certa quantidade de corrente (em mA ou µA).
+    \item Um microcontrolador pode fornecer apenas uma quantidade limitada de corrente por pino (~40mA em Arduino).
+    \item Se você conectar um componente que consome 100mA no pino digital, pode danificar o microcontrolador.
+    \item \textbf{Solução}: usar componentes que consomem menos corrente, ou usar um transistor/driver.
+    \item Exemplo: LED consome ~20mA (cuidado!), sensor ultrassônico consome ~15mA.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Protocolo de Comunicação}
+  \begin{itemize}
+    \item Diferentes sensores usam diferentes protocolos:
+    \begin{itemize}
+      \item \textbf{I2C}: 2 fios (SDA, SCL), vários dispositivos no mesmo barramento.
+      \item \textbf{SPI}: 4 fios (MOSI, MISO, CLK, CS), mais rápido que I2C.
+      \item \textbf{UART}: comunicação serial, 2 fios (TX, RX).
+      \item \textbf{Digital simples}: apenas HIGH/LOW (ex: sensor ultrassônico).
+    \end{itemize}
+    \item O datasheet especifica qual protocolo o componente usa.
+    \item Escolher o protocolo errado significa que o componente não funcionará com seu projeto.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Checklist antes de comprar}
+  \begin{enumerate}
+    \item \textbf{Encontrou o datasheet?} Se não, não compre.
+    \item \textbf{Tensão correta?} Compatível com seu microcontrolador?
+    \item \textbf{Protocolo compatível?} I2C/SPI/UART que seu microcontrolador suporta?
+    \item \textbf{Pinos disponíveis?} Seu microcontrolador tem os pinos necessários?
+    \item \textbf{Corrente?} O microcontrolador consegue fornecer a corrente necessária?
+    \item \textbf{Precisão adequada?} O sensor tem precisão suficiente para seu projeto?
+    \item \textbf{Vendor confiável?} O vendedor tem boas avaliações?
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Especificações técnicas: O que procurar?}
+  \begin{itemize}
+    \item \textbf{Faixa de operação}: qual intervalo o sensor consegue medir?
+    \item \textbf{Resolução}: qual é o menor valor que o sensor consegue diferenciar?
+    \item \textbf{Precisão}: qual é o erro máximo esperado?
+    \item \textbf{Tempo de resposta}: quanto tempo demora para o sensor responder?
+    \item \textbf{Temperatura de operação}: funciona em ambientes frios/quentes?
+    \item Exemplo GPS: precisão de 2.5m significa que pode estar até 2.5m longe da posição real.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Comunicação com o Fornecedor}
+  \begin{itemize}
+    \item Antes de comprar, você pode fazer perguntas!
+    \item \textbf{Em AliExpress}: use o chat, pergunte:
+    \begin{itemize}
+      \item ``Este módulo é compatível com ESP32 (3.3V)?''
+      \item ``Qual é a precisão exata do sensor GPS?''
+      \item ``Vem com pinos soldados ou preciso soldar?''
+    \end{itemize}
+    \item \textbf{Respostas de qualidade}: vendedores bons respondem rápido e com detalhes.
+    \item Se o vendedor não responde ou responde vago, compre de outro.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Armadilhas comuns na compra}
+  \begin{itemize}
+    \item \textbf{Clones/falsificados}: componentes copiados que não funcionam bem.
+    \begin{itemize}
+      \item Solução: compre de vendedores com muitas avaliações positivas.
+    \end{itemize}
+    \item \textbf{Descrição enganosa}: anúncio promete precisão mas datasheet diz outra coisa.
+    \begin{itemize}
+      \item Solução: sempre verifique o datasheet.
+    \end{itemize}
+    \item \textbf{Falta de suporte técnico}: vendedor desaparece quando há problema.
+    \begin{itemize}
+      \item Solução: compre de plataformas com proteção do comprador.
+    \end{itemize}
+    \item \textbf{Tempo de entrega subestimado}: demora muito mais que prometido.
+    \begin{itemize}
+      \item Solução: leia avaliações sobre tempo de entrega.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Quando você recebe o componente}
+  \begin{itemize}
+    \item \textbf{Verificar a embalagem}: verifique se chegou em bom estado, sem danos.
+    \item \textbf{Verificar o modelo}: compare o modelo no componente com o que pediu.
+    \item \textbf{Teste rápido}: antes de integrar ao projeto, faça um teste rápido.
+    \begin{itemize}
+      \item Conecte o sensor, rode um código de teste simples.
+      \item Verifique se as leituras fazem sentido.
+    \end{itemize}
+    \item \textbf{Se não funcionar}: tente contato com o vendedor rapidamente.
+    \item Mantenha a embalagem original por alguns dias (até confirmar que funciona).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Exemplo de Compra Bem Feita}
+  \begin{itemize}
+    \item \textbf{Projeto}: seguidor de linha com ESP32.
+    \item \textbf{Componente necessário}: sensor óptico reflexivo QTR-8.
+    \item \textbf{Passos}:
+    \begin{enumerate}
+      \item Procurei pelo datasheet do QTR-8 (encontrei tensão: 3.3V-5V, interface: analógica).
+      \item Verifiquei que ESP32 tem portas analógicas suficientes.
+      \item Comprei de um vendedor com muitas avaliações positivas.
+      \item Perguntei se vinha com pinos soldados (veio).
+      \item Ao chegar, testei com um código simples antes de integrar.
+    \end{enumerate}
+    \item Resultado: componente funcionou perfeitamente na primeira tentativa.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Quantidade: Compre extras!}
+  \begin{itemize}
+    \item \textbf{Sempre compre pelo menos 2 unidades de cada componente crítico}.
+    \begin{itemize}
+      \item Um pode chegar com defeito.
+      \item Um pode queimar durante os testes.
+      \item Você terá um de backup.
+    \end{itemize}
+    \item Componentes eletrônicos são baratos, especialmente em quantidade.
+    \item Perder 1-2 dias esperando por um novo componente é frustrante.
+    \item Exemplos: sensores, módulos de comunicação, motores.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Documentação: Salve tudo!}
+  \begin{itemize}
+    \item Quando receber o componente, salve o datasheet em uma pasta do projeto.
+    \item Tire screenshots de informações importantes no anúncio de compra.
+    \item Anote o modelo exato, data de compra, fornecedor.
+    \item \textbf{Isso será útil se}:
+    \begin{itemize}
+      \item Você precisar reproduzir o projeto meses depois.
+      \item Alguém pedir para você fazer algo similar.
+      \item Você tiver um problema e precisar revisar o datasheet.
+    \end{itemize}
+    \item Tempo gasto documentando = tempo economizado no futuro.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Resumo: Os 5 passos para comprar corretamente}
+  \begin{enumerate}
+    \item \textbf{Pesquisar}: datasheet, especificações, avaliações do vendedor.
+    \item \textbf{Questionar}: pergunte dúvidas ao vendedor antes de comprar.
+    \item \textbf{Verificar compatibilidade}: tensão, protocolo, pinos necessários.
+    \item \textbf{Testar}: quando chegar, faça testes antes de integrar ao projeto.
+    \item \textbf{Documentar}: salve datasheets e informações importantes.
+  \end{enumerate}
+  
+  \begin{itemize}
+    \item Seguir esses passos economiza tempo, dinheiro e muita frustração.
+    \item Um projeto bem planejado desde a compra dos componentes tem 80\% de chance de funcionar na primeira tentativa.
+  \end{itemize}
+\end{frame}
+
+\end{document}

@@ -19,7 +19,7 @@
   showstringspaces=false,
 }
 
-\title{Funções e Estruturas em C++}
+\title{Estrutura de Programas: Funções e Structs}
 \subtitle{Curso de Microcontroladores}
 \author{}
 \date{}
@@ -30,6 +30,108 @@
   \titlepage
 \end{frame}
 
+\begin{frame}{O desafio de um programa grande}
+  \begin{itemize}
+    \item Quando seu programa tem centenas de linhas, fica muito difícil de ler, manter e corrigir.
+    \item Programas de robótica, como um seguidor de linha, precisam:
+    \begin{itemize}
+      \item Ler sensores constantemente.
+      \item Fazer cálculos matemáticos complexos (como PID).
+      \item Controlar motores em tempo real.
+      \item Talvez comunicar via serial.
+    \end{itemize}
+    \item Fazer tudo isso em um único bloco de código seria complexo e geraria um código difícil de manter.
+    \item A solução é \textbf{quebrar o programa em partes menores e testáveis}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{O Padrão IPO (Entrada, Processamento, Saída)}
+  \begin{itemize}
+    \item Todo programa segue logicamente um padrão simples: \textbf{IPO}.
+    \item \textbf{Entrada}: O robô coleta dados do mundo físico (sensores).
+    \item \textbf{Processamento}: O código analisa esses dados e toma decisões.
+    \item \textbf{Saída}: O robô atua no mundo (motores, LEDs, etc).
+    \item No caso do seguidor de linha:
+    \begin{itemize}
+      \item \textbf{Entrada}: Lê a linha com sensores ópticos.
+      \item \textbf{Processamento}: Calcula o erro de posição e aplica PID.
+      \item \textbf{Saída}: Ajusta a velocidade dos motores.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{O Padrão IPO (Entrada, Processamento, Saída)}
+  \begin{itemize}
+    \item O padrão IPO não representa só o que o seguidor é capaz de fazer por inteiro, com os sensores sendo entrada, o PID sendo processamento e os motores sendo saída.
+    \item Ele também pode ser aplicado dentro de cada coisa, ou seja, o sensor pode ser seu IPO, sendo a entrada a luz refletida, o processamento a conversão analógica-digital e a saída o valor 0-1023.
+    \item O PID também tem seu próprio IPO, onde a entrada é o erro, o processamento é o cálculo dos termos P, I e D, e a saída é a correção.
+    \item O controle dos motores também tem seu IPO, onde a entrada é a correção, o processamento é a validação e ajuste da velocidade, e a saída é o sinal PWM aplicado aos motores.
+    \item Ou seja, o padrão IPO é uma forma de organizar o pensamento e o código em níveis hierárquicos, desde o programa inteiro até cada função individual.
+    \item Isso torna tudo muito mais simples
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\texttt{loop()}}
+\begin{lstlisting}
+void setup() {
+  // Executado APENAS uma vez ao ligar
+  Serial.begin(9600);
+  pinMode(SENSOR_PIN, INPUT);
+}
+
+void loop() {
+  // Executado REPETIDAMENTE, centenas de vezes por segundo
+  int leitura = analogRead(SENSOR_PIN);
+  Serial.println(leitura);
+  delay(10);  // pequena pausa
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `setup()` roda uma única vez: você configura pinos, inicia comunicação serial, etc.
+    \item `loop()` roda infinitamente
+    \item Quanto mais rápido o `loop()` rodar, mais responsivo o robô será.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Por que usar funções?}
+  \begin{itemize}
+    \item Sim, você \textit{poderia} escrever tudo no `loop()`, mas seria pouco eficiente.
+    \item Funções permitem que você \textbf{quebre o problema em partes menores}.
+    \item Cada função possui uma responsabilidade única.
+    \item Você testa cada função isoladamente antes de integrar.
+    \item Exemplo: uma função apenas para ler sensores, outra apenas para calcular, outra para atuar.
+    \item Isso também facilita trabalhar em equipe: um desenvolve `lerSensores()`, outro desenvolve `calcularPID()`.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exemplo: Um programa sem funções}
+\begin{lstlisting}
+void loop() {
+  // Ler 8 sensores manualmente
+  int s0 = analogRead(A0);
+  int s1 = analogRead(A1);
+  // ... mais 6 linhas ...
+  int s7 = analogRead(A7);
+  
+  // Calcular média e erro (muitas linhas)
+  int somatorio = s0 + s1 + ... + s7;
+  int media = somatorio / 8;
+  int erro = media - 500;
+  
+  // Controlar motores manualmente
+  analogWrite(MOTOR_L, 200 - erro);
+  analogWrite(MOTOR_R, 200 + erro);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Tudo misturado no `loop()`.
+    \item Se houver um bug, é difícil saber se é na leitura, no cálculo ou na saída.
+    \item Código muito repetitivo (muito `analogRead()` seguido).
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]{O que é uma função?}
 \begin{lstlisting}
 int somar(int a, int b) {
@@ -37,111 +139,279 @@ int somar(int a, int b) {
 }
 
 void setup() {
-  int resultado = somar(5, 3);
-  // resultado agora é 8
+  int resultado = somar(5, 3);  // resultado = 8
 }
 \end{lstlisting}
 
   \begin{itemize}
-    \item Função é um bloco de código reutilizável.
-    \item `int somar(...)` retorna um inteiro.
-    \item `void` significa que não retorna nada.
-    \item Parâmetros passam dados para a função.
+    \item Função é um bloco de código reutilizável com um nome específico.
+    \item `int somar(int a, int b)` significa: recebe dois inteiros e \textbf{retorna} um inteiro.
+    \item `void` significa que a função não retorna nada (apenas executa).
+    \item Parâmetros (`a` e `b`) são dados que você passa para a função.
+    \item `return` envia um valor de volta ao código que chamou a função.
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Funções sem retorno}
+\begin{frame}[fragile]{Mini IPO: Função de Entrada}
 \begin{lstlisting}
-void piscarLED(int vezes) {
-  for (int i = 0; i < vezes; i++) {
-    digitalWrite(LED_PIN, HIGH);
-    delay(500);
-    digitalWrite(LED_PIN, LOW);
-    delay(500);
+int lerSensores() {
+  // ENTRADA: coleta dados
+  int valores[8];
+  for (int i = 0; i < 8; i++) {
+    valores[i] = analogRead(sensorPinos[i]);
   }
-}
-
-void loop() {
-  piscarLED(3);  // pisca 3 vezes
+  
+  // PROCESSAMENTO: calcula a posição
+  int somatorio = 0;
+  for (int i = 0; i < 8; i++) {
+    somatorio += valores[i];
+  }
+  int posicao = somatorio / 8;
+  
+  // SAÍDA (da função): retorna o resultado
+  return posicao;
 }
 \end{lstlisting}
 
   \begin{itemize}
-    \item `void` não retorna nada, apenas executa.
-    \item Ótimo para ações repetitivas.
-    \item Deixa o código mais organizado e legível.
-  \end{itemize}\n\\end{frame}
+    \item Cada função pode ter seu próprio \textbf{mini IPO}.
+    \item Esta função: lê sensores, processa, retorna um valor.
+    \item Você pode testar `lerSensores()` isoladamente para garantir que funciona.
+  \end{itemize}
+\end{frame}
 
-\begin{frame}[fragile]{Funções que retornam valores}
+\begin{frame}[fragile]{Mini IPO: Função de Processamento}
 \begin{lstlisting}
-float lerTemperatura() {
-  int leitura = analogRead(TEMP_PIN);
-  float temp = (leitura / 1023.0) * 100;
-  return temp;
-}
-
-void loop() {
-  float temperatura = lerTemperatura();
-  Serial.println(temperatura);
+int calcularPID(int posicaoAtual) {
+  // ENTRADA: recebe a posição
+  static int erroAnterior = 0;
+  int erro = posicaoAtual - 500;
+  
+  // PROCESSAMENTO: cálculo PID
+  float P = erro * 0.5;
+  float I = /* acumulador */ ;
+  float D = (erro - erroAnterior) * 0.2;
+  int correcao = (P + I + D);
+  
+  erroAnterior = erro;
+  
+  // SAÍDA: retorna a correção
+  return correcao;
 }
 \end{lstlisting}
 
   \begin{itemize}
-    \\item `return` envia um valor de volta.
-    \\item Tipo deve corresponder (float retorna float).
-    \\item Resultado pode ser armazenado em variável.
-  \\end{itemize}
-\\end{frame}
+    \item Esta função recebe um valor, processa com PID, retorna a correção.
+    \item Você pode testar com valores conhecidos: se posição é 500 (centro), deve retornar 0.
+  \end{itemize}
+\end{frame}
 
-\\begin{frame}[fragile]{Estrutura simples em C++}
-\\begin{lstlisting}
+\begin{frame}[fragile]{Mini IPO: Função de Saída}
+\begin{lstlisting}
+void controlarMotores(int velocidadeEsq, 
+                      int velocidadeDir) {
+  // ENTRADA: recebe as velocidades (parâmetros)
+  
+  // PROCESSAMENTO: validação
+  velocidadeEsq = constrain(velocidadeEsq, 0, 255);
+  velocidadeDir = constrain(velocidadeDir, 0, 255);
+  
+  // SAÍDA: atua nos motores
+  analogWrite(MOTOR_L, velocidadeEsq);
+  analogWrite(MOTOR_R, velocidadeDir);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `void` significa que não retorna nada, apenas executa.
+    \item Recebe velocidades, valida, aplica aos pinos PWM.
+    \item `constrain()` garante que os valores fiquem entre 0-255.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{O \texttt{loop()} como Orquestrador}
+\begin{lstlisting}
+void loop() {
+  // Mini IPO 1: Ler sensores
+  int posicao = lerSensores();
+  
+  // Mini IPO 2: Calcular correção
+  int correcao = calcularPID(posicao);
+  
+  // Mini IPO 3: Atuar nos motores
+  int velEsq = 150 - correcao;
+  int velDir = 150 + correcao;
+  controlarMotores(velEsq, velDir);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item O `loop()` não contém lógica complexa, apenas chamadas de função.
+    \item Fica muito legível: você vê exatamente o que o robô faz em cada ciclo.
+    \item Se há um problema, você sabe exatamente qual função investigar.
+    \item Cada função roda rapidamente, mantendo a taxa de amostragem alta.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Estruturas: Agrupando Dados Relacionados}
+  \begin{itemize}
+    \item Um robô tem muitos componentes: sensores, motores, LED, bateria, etc.
+    \item Em vez de criar variáveis soltas (`motorEsqVel`, `motorDirVel`, `motorEsqPino`...), usamos `struct`.
+    \item `struct` é um tipo de dado personalizado que agrupa valores relacionados.
+    \item Exemplo: um motor possui pino PWM, pino de direção, velocidade atual. Todos esses dados relacionados podem estar em uma `struct`.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Definindo e Usando uma Estrutura}
+\begin{lstlisting}
 struct Motor {
-  int pino;
+  int pinoPWM;
+  int pinoDir;
   int velocidade;
 };
 
 void setup() {
-  Motor motor1;
-  motor1.pino = 9;
-  motor1.velocidade = 200;
-  analogWrite(motor1.pino, motor1.velocidade);
+  Motor motorEsq;
+  motorEsq.pinoPWM = 5;
+  motorEsq.pinoDir = 6;
+  motorEsq.velocidade = 0;
+  
+  pinMode(motorEsq.pinoPWM, OUTPUT);
+  pinMode(motorEsq.pinoDir, OUTPUT);
 }
-\\end{lstlisting}
+\end{lstlisting}
 
-  \\begin{itemize}
-    \\item `struct` agrupa dados relacionados.
-    \\item Acessa dados com `.` (ponto).
-    \\item Deixa código mais organizado quando há vários dados.
-  \\end{itemize}
-\\end{frame}
+  \begin{itemize}
+    \item Você acessa propriedades com o `.` (ponto).
+    \item Deixa claro que essas três variáveis pertencem ao mesmo motor.
+    \item Muito mais legível do que `motor1_PWM`, `motor1_DIR`, etc.
+  \end{itemize}
+\end{frame}
 
-\\begin{frame}[fragile]{Função que recebe uma estrutura}
-\\begin{lstlisting}
-struct Sensor {
-  int pino;
-  float valor;
-};
-
-float lerSensor(Sensor s) {
-  s.valor = analogRead(s.pino);
-  return s.valor / 1023.0 * 100;
+\begin{frame}[fragile]{Funções que recebem estruturas}
+\begin{lstlisting}
+void controlarMotor(Motor motor, int velocidade) {
+  motor.velocidade = velocidade;
+  analogWrite(motor.pinoPWM, velocidade);
+  
+  if (velocidade > 0) {
+    digitalWrite(motor.pinoDir, HIGH);  // frente
+  } else {
+    digitalWrite(motor.pinoDir, LOW);   // trás
+  }
 }
 
 void loop() {
-  Sensor temperatura;
-  temperatura.pino = A0;
-  float temp = lerSensor(temperatura);
+  controlarMotor(motorEsq, 150);
+  controlarMotor(motorDir, 150);
 }
-\\end{lstlisting}
-\\end{frame}
+\end{lstlisting}
 
-\\begin{frame}{Vantagens de usar funções e estruturas}
-  \\begin{itemize}
-    \\item Código fica reutilizável e organizado.
-    \\item Fácil de testar cada parte isoladamente.
-    \\item Menos chance de cometer erros.
-    \\item Em projetos maiores, essencial para manutenção.
-  \\end{itemize}
-\\end{frame}
+  \begin{itemize}
+    \item Você passa uma `struct` inteira para a função.
+    \item A função trabalha com todos os dados do motor de uma vez.
+    \item Muito mais elegante do que passar cada propriedade separadamente.
+  \end{itemize}
+\end{frame}
 
-\\end{document}
+\begin{frame}[fragile]{Exemplo Completo: Seguidor Estruturado}
+\begin{lstlisting}
+struct Sensor {
+  int pino;
+  int valor;
+};
+
+struct Motor {
+  int pinoPWM;
+  int pinoDir;
+};
+
+Sensor sensores[8];
+Motor motorEsq, motorDir;
+
+void setup() {
+  // Inicializa sensores e motores
+  for (int i = 0; i < 8; i++) {
+    sensores[i].pino = A0 + i;
+  }
+  motorEsq.pinoPWM = 5;
+  motorEsq.pinoDir = 6;
+  // ... etc
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Você pode ter arrays de estruturas (`sensores[8]`).
+    \item Muito mais organizado do que dezenas de variáveis soltas.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Testando Cada Função Isoladamente}
+  \begin{itemize}
+    \item Quando você quebra o programa em funções, pode testar cada uma separadamente.
+    \item \textbf{Teste de entrada}: rode apenas `lerSensores()`, coloque Serial.println() e veja se os valores fazem sentido.
+    \item \textbf{Teste de processamento}: passe valores conhecidos para `calcularPID()` e verifique se o resultado está correto.
+    \item \textbf{Teste de saída}: rode `controlarMotores()` e ouça o motor para garantir que a velocidade está mudando.
+    \item Isso torna muito mais fácil encontrar e corrigir bugs.
+    \item Você descobrir que um motor não está funcionando é bem diferente de descobrir que o cálculo do PID está errado.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Laços (Loops) dentro de Funções}
+  \begin{itemize}
+    \item Usar laços `for` e `while` dentro de funções é importante para controlar fluxo e repetição.
+    \item Laços no `loop()` do Arduino vs laços dentro de funções:
+    \begin{itemize}
+      \item Laços dentro de funções têm \textbf{escopo local}, o que significa que as variáveis do laço não afetam o resto do programa.
+      \item Você tem mais controle: pode quebrar, continuar, ou fazer múltiplas iterações de forma clara.
+    \end{itemize}
+    \item Exemplo: usar `for` para ler todos os 8 sensores dentro de `lerSensores()` é mais claro do que ter 8 linhas soltas no `loop()`.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Cuidado com \texttt{delay()}}
+\begin{lstlisting}
+// ❌ RUIM: delay() no loop() bloqueia tudo
+void loop() {
+  lerSensores();
+  delay(100);  // 100ms sem fazer nada!
+  calcularPID();
+}
+
+// ✓ BOM: usar millis() para não bloquear
+unsigned long tempoAnterior = 0;
+void loop() {
+  unsigned long tempoAtual = millis();
+  if (tempoAtual - tempoAnterior >= 100) {
+    tempoAnterior = tempoAtual;
+    lerSensores();
+    calcularPID();
+  }
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `delay()` congela todo o programa. O robô não responde a sensores durante esse tempo!
+    \item Para tarefas periódicas, use `millis()` e verificação de tempo.
+    \item Isso mantém o robô responsivo e permite múltiplas tarefas em ``paralelo''.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Resumo: Estrutura de um Bom Programa}
+  \begin{enumerate}
+    \item \textbf{Defina estruturas} para agrupar dados relacionados (Motor, Sensor).
+    \item \textbf{Quebre em funções}: cada função faz uma coisa bem.
+    \item \textbf{Use mini IPOs}: cada função tem entrada → processamento → saída.
+    \item \textbf{Mantenha o \texttt{loop()} limpo}: apenas chamadas de função.
+    \item \textbf{Teste isoladamente}: valide cada função antes de integrar.
+    \item \textbf{Evite \texttt{delay()}}: use `millis()` para tarefas periódicas.
+  \end{enumerate}
+  
+  \begin{itemize}
+    \item Um programa estruturado assim fica fácil de entender, manter e depurar.
+    \item Você consegue trabalhar em equipe sem conflitos.
+    \item Adicionar novos recursos (como LED de status, comunicação LoRa) é trivial.
+  \end{itemize}
+\end{frame}
+
+\end{document}

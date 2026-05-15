@@ -19,7 +19,7 @@
   showstringspaces=false,
 }
 
-\title{Comunicação Serial}
+\title{Comunicação Serial e Bluetooth}
 \subtitle{Curso de Microcontroladores}
 \author{}
 \date{}
@@ -30,125 +30,286 @@
   \titlepage
 \end{frame}
 
-\begin{frame}{O que é comunicação serial?}
+\begin{frame}{Serial vs Bluetooth}
   \begin{itemize}
-    \item Forma de enviar dados entre Arduino e computador.
-    \item Usa 1 pino RX (recebe) e 1 pino TX (transmite).
-    \item Velocidade padrão: 9600 baud.
-    \item Essencial para debug e monitoramento.
+    \item \textbf{Serial USB}: conectado por cabo ao computador, mais rápido, apenas debug.
+    \item \textbf{Bluetooth}: comunicação sem fio via telefone/tablet, essencial para robótica.
+    \item No seguidor de linha com ESP32, você quer:
+    \begin{itemize}
+      \item Debug: valores dos sensores, PID, estado da máquina.
+      \item Controle: iniciar/parar, ajustar KP/KD em tempo real.
+      \item Telemetria: monitorar desempenho enquanto o robô roda.
+    \end{itemize}
+    \item Bluetooth permite isso sem a limitação do fio.
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Inicializando comunicação}
+\begin{frame}[fragile]{Comunicação Serial Tradicional}
 \begin{lstlisting}
 void setup() {
-  Serial.begin(9600);  // Inicia serial a 9600 baud
+  Serial.begin(9600);  // Serial USB
   Serial.println("Sistema iniciado!");
 }
 
 void loop() {
-  Serial.print("Valor: ");
+  Serial.print("Sensor: ");
   Serial.println(analogRead(A0));
-  delay(1000);
-}
-\end{lstlisting}
-
-  \begin{itemize}
-    \item `Serial.begin()` inicia a comunicação.
-    \item Deve ser chamado em `setup()`.
-    \item Velocidade deve ser a mesma do monitor.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Funções Serial comuns}
-  \begin{itemize}
-    \item `Serial.print()`: imprime sem quebra de linha.
-    \item `Serial.println()`: imprime com quebra de linha.
-    \item `Serial.write()`: envia um byte bruto.
-    \item `Serial.read()`: lê um byte do computador.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Monitorando sensores}
-\begin{lstlisting}
-void loop() {
-  int sensor1 = analogRead(A0);
-  int sensor2 = analogRead(A1);
-  int sensor3 = analogRead(A2);
-  
-  Serial.print("Sensores: ");
-  Serial.print(sensor1);
-  Serial.print(", ");
-  Serial.print(sensor2);
-  Serial.print(", ");
-  Serial.println(sensor3);
-  
   delay(100);
 }
 \end{lstlisting}
 
-  Abra o Monitor Serial no Arduino IDE (Ctrl+Shift+M) para ver os valores.
+  \begin{itemize}
+    \item `Serial.begin()` abre a porta USB.
+    \item Útil para testes com cabo conectado.
+    \item Abra Monitor Serial no Arduino IDE (Ctrl+Shift+M).
+  \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Recebendo dados do computador}
+\begin{frame}[fragile]{Bluetooth Serial no ESP32}
 \begin{lstlisting}
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+void setup() {
+  Serial.begin(115200);  // USB para debug
+  SerialBT.begin("XerapoBT");  // Nome do dispositivo Bluetooth
+}
+
 void loop() {
-  if (Serial.available() > 0) {
-    char comando = Serial.read();
-    
-    if (comando == 'L') {
-      digitalWrite(LED_PIN, HIGH);
-    } else if (comando == 'D') {
-      digitalWrite(LED_PIN, LOW);
+  if (SerialBT.available()) {
+    String comando = SerialBT.readStringUntil('\n');
+    SerialBT.println("Comando recebido: " + comando);
+  }
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item `BluetoothSerial` é a biblioteca Bluetooth Clássico do ESP32.
+    \item Nome do dispositivo aparece no pareamento (ex: ``XerapoBT'').
+    \item `SerialBT.begin()` inicia, não requer pinos específicos (usa SPI internamente).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Por que Bluetooth no Seguidor?}
+  \begin{itemize}
+    \item \textbf{Sintonização de PID}: ajuste KP e KD sem parar o robô.
+    \item \textbf{Controle remoto}: inicie/pare o robô de longe.
+    \item \textbf{Monitoramento}: veja leituras de sensores em tempo real via app.
+    \item \textbf{Debug sem fio}: sem cabo pendurado no robô enquanto ele corre.
+    \item \textbf{Competições}: monitore o robô durante a prova no transístor.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exemplo Real: Processamento de Comandos Bluetooth}
+\begin{lstlisting}
+float KP = 0.5;
+float KD = 0.4;
+int VEL_MAX = 80;
+bool start = false;
+
+void processarComandosBT() {
+  if (SerialBT.available()) {
+    String comando = SerialBT.readStringUntil('\n');
+    comando.trim();
+
+    if (comando.startsWith("kp ")) {
+      KP = comando.substring(3).toFloat();
+    } else if (comando.startsWith("kd ")) {
+      KD = comando.substring(3).toFloat();
+    } else if (comando.startsWith("vel ")) {
+      VEL_MAX = comando.substring(4).toInt();
+    } else if (comando == "INICIA") {
+      start = true;
+    } else if (comando == "PARA") {
+      start = false;
     }
   }
 }
 \end{lstlisting}
 
   \begin{itemize}
-    \item `Serial.available()` verifica se há dados.
-    \item `Serial.read()` pega um byte.
+    \item Comandos formato: ``kp 0.6'', ``kd 0.3'', ``vel 100'', ``INICIA'', ``PARA''.
+    \item `readStringUntil('\n')` lê até quebra de linha.
+    \item `substring()` extrai parte do texto.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Debug em tempo real}
-  \begin{itemize}
-    \item Mostre valores de sensores regularmente.
-    \item Indique quando estados mudam.
-    \\item Facilita encontrar problemas rapidamente.
-    \\item Não deixe muitos `println()` no código final (fica lento).
-  \\end{itemize}
-\\end{frame}
-
-\\begin{frame}[fragile]{Dica: formatar saída}
-\\begin{lstlisting}
-void loop() {
-  int valor = analogRead(A0);
-  
-  // Mostrar em diferentes formatos
-  Serial.print("Dec: ");
-  Serial.print(valor);
-  Serial.print(", Hex: ");
-  Serial.print(valor, HEX);
-  Serial.print(", Bin: ");
-  Serial.println(valor, BIN);
+\begin{frame}[fragile]{Enviando Telemetria via Bluetooth}
+\begin{lstlisting}
+void enviarTelemetria() {
+  // Enviar estado do robô ao telefone
+  SerialBT.print("Pos:");
+  SerialBT.print(posicaoAtual);
+  SerialBT.print(" Erro:");
+  SerialBT.print(erro);
+  SerialBT.print(" VelE:");
+  SerialBT.print(velocidadeEsq);
+  SerialBT.print(" VelD:");
+  SerialBT.println(velocidadeDir);
 }
-\\end{lstlisting}
 
-  \\begin{itemize}
-    \\item `DEC`: decimal (padrão)
-    \\item `HEX`: hexadecimal
-    \\item `BIN`: binário
-  \\end{itemize}
-\\end{frame}
+void loop() {
+  processarComandosBT();
+  
+  if (millis() - lastTelemetry > 100) {
+    lastTelemetry = millis();
+    enviarTelemetria();  // Enviar a cada 100ms
+  }
+  
+  // resto do código
+}
+\end{lstlisting}
 
-\\begin{frame}{Importante para o seguidor}
-  \\begin{itemize}
-    \\item Monitore leitura dos sensores continuamente.
-    \\item Veja valores do PID em tempo real.
-    \\item Teste antes de rodar o robô na linha.
-    \\item Serial é ferramenta de desenvolvimento, não coloque no código final otimizado.
-  \\end{itemize}
-\\end{frame}
+  \begin{itemize}
+    \item Envie telemetria em intervalos (não a cada ciclo).
+    \item Deixa a interface mais responsiva.
+    \item Telefone visualiza em tempo real.
+  \end{itemize}
+\end{frame}
 
-\\end{document}
+\begin{frame}[fragile]{Mini IPO: Comunicação Bluetooth}
+\begin{lstlisting}
+// ENTRADA: receber comandos
+processarComandosBT();
+
+// PROCESSAMENTO: comandos já modificam KP, KD, VEL_MAX, start
+// (feito dentro de processarComandosBT)
+
+// SAÍDA: enviar telemetria
+if (/* tempo de envio */) {
+  enviarTelemetria();
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Comunicação segue mini IPO também.
+    \item Entrada: lê comandos do usuário.
+    \item Processamento: modifica variáveis globais (KP, KD, etc).
+    \item Saída: envia telemetria de volta.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Pareando com Smartphone}
+  \begin{itemize}
+    \item \textbf{Android}: Configurações → Bluetooth → Procurar dispositivos → XerapoBT.
+    \item \textbf{iOS}: Configurações → Bluetooth → XerapoBT (iOS suporta Bluetooth Clássico em casos limitados).
+    \item Após parear, código pode enviar/receber dados.
+    \item \textbf{Apps úteis}: 
+    \begin{itemize}
+      \item \textit{Serial Bluetooth Terminal} (Android) - terminal simples.
+      \item \textit{Bluetooth Electronics} (Android) - interface customizável.
+      \item \textit{Swift Playgrounds} (iOS) - se suportar.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Teste Básico via Terminal}
+\begin{lstlisting}
+// No celular, abra a app Serial Bluetooth Terminal
+// Envie esses comandos:
+
+kp 0.6      // Aumenta KP
+kd 0.5      // Aumenta KD
+vel 100     // Velocidade máxima = 100
+INICIA      // Inicia o robô
+// Espere rodar...
+PARA        // Para o robô
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Use terminal Bluetooth para testar.
+    \item Veja a telemetria sendo exibida em tempo real.
+    \item Ajuste KP/KD até encontrar a melhor combinação.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Diferença: Serial USB vs Bluetooth}
+  \begin{itemize}
+    \item \textbf{Serial USB}:
+    \begin{itemize}
+      \item Mais rápido (baud higher).
+      \item Precisa de cabo conectado.
+      \item Ideal para debug intensivo no desenvolvimento.
+    \end{itemize}
+    \item \textbf{Bluetooth}:
+    \begin{itemize}
+      \item Sem fio, liberdade total.
+      \item Um pouco mais lento (mas suficiente).
+      \item Ideal para testes em pista e competições.
+      \item Pode deixar ativo enquanto robô corre.
+    \end{itemize}
+    \item \textbf{Dica}: use ambos. Serial USB para debug detalhado, Bluetooth para controle remoto.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exemplo Completo: Integração com Loop}
+\begin{lstlisting}
+void loop() {
+  // 1. Processa comandos Bluetooth (controle)
+  processarComandosBT();
+
+  // 2. Limita taxa de amostragem
+  if (millis() - lastLoopTime < loopInterval) {
+    return;
+  }
+  lastLoopTime = millis();
+
+  // 3. Lê sensores e calcula PID
+  qtr.read(sensorValues);
+  if (start) {
+    calcularPID();  // Atua nos motores
+  }
+
+  // 4. Envia telemetria de volta
+  if (millis() - lastTelemetry > 100) {
+    lastTelemetry = millis();
+    enviarTelemetria();
+  }
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Fora do `loop()` crítico, o Bluetooth é apenas um periférico.
+    \item Não bloqueia o controle principal.
+    \item Permite ajustes em tempo real sem perder responsividade.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Debug em Tempo Real}
+  \begin{itemize}
+    \item \textbf{Monitore}: posição, erro, velocidades, valores de PID.
+    \item \textbf{Ajuste}: KP e KD enquanto robô corre.
+    \item \textbf{Identifique problemas}: o robô fica oscilando? Diminua KD. Fica devagar? Aumente KP.
+    \item \textbf{Teste cenários}: robô segue em reta? E em curva? E se a linha desaparecer?
+    \item \textbf{Registre valores bons}: quando achar a combinação perfeita, anote os parâmetros finais.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Boas Práticas com Bluetooth}
+  \begin{itemize}
+    \item \textbf{Não envie telemetria a cada ciclo}: use intervalos (ex: 100ms).
+    \item \textbf{Cuidado com strings}: `readStringUntil()` é prático mas consome memória. Para produção, considere protocolo binário.
+    \item \textbf{Pare o Bluetooth em modo competição}: durante prova, desligue app para evitar interferências.
+    \item \textbf{Sempre teste sem fio}: em testes de pista, o robô pode sair do alcance. Planeje isso.
+    \item \textbf{Mantenha nomes descritivos}: ``XerapoBT'' é melhor que ``BT01'' (identifica seu robô rapidamente).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Resumo: Comunicação Bluetooth para Robótica}
+  \begin{enumerate}
+    \item \textbf{Setup}: `SerialBT.begin("Nome")` em `setup()`.
+    \item \textbf{Receber}: `if (SerialBT.available())` lê comandos.
+    \item \textbf{Processar}: modifica parâmetros (KP, KD, velocidade).
+    \item \textbf{Enviar}: telemetria em intervalos regulares.
+    \item \textbf{Testar}: use app terminal Bluetooth no celular.
+    \item \textbf{Integrar}: comunicação roda em paralelo com o `loop()` principal sem bloquear.
+  \end{enumerate}
+  
+  \begin{itemize}
+    \item Bluetooth é essencial para debug, ajuste e controle remoto.
+    \item Mantém o robô responsivo enquanto permite sintonização em tempo real.
+  \end{itemize}
+\end{frame}
+
+\end{document}
