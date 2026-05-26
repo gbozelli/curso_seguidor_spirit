@@ -1,0 +1,167 @@
+# .gitignore padrão para projetos Python, JavaScript, C/C++
+
+# ==================== Python ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IPython
+.ipython/
+.ipynb_checkpoints/
+
+# Jupyter Notebook
+.jupyter/
+
+# pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# ==================== JavaScript/Node ====================
+node_modules/
+npm-debug.log
+yarn-error.log
+*.tgz
+
+# ==================== C/C++ ====================
+*.o
+*.obj
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# Build directories
+build/
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+
+# ==================== IDEs ====================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+
+# Visual Studio
+.vs/
+*.sln.docstates
+
+# Vim
+*~
+*.swp
+*.swo
+
+# ==================== Sistemas ====================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+
+# ==================== Variáveis de Ambiente ====================
+.env
+.env.local
+.env.*.local
+*.env
+
+# ==================== Arquivos Sensíveis ====================
+*.pem
+*.key
+*.pub
+secrets/
+credentials/
+
+# ==================== Logs ====================
+*.log
+logs/
+*.err
+
+# ==================== Temporários ====================
+.tmp/
+temp/
+tmp/
+*.bak
+*.backup
+*.cache
+
+# ==================== Arquivos Grandes ====================
+*.psd
+*.ai
+*.zip
+*.rar
+*.7z
+*.mp4
+*.mkv
+*.mov
+
+# ==================== Específico do Projeto ====================
+# Adicione aqui arquivos específicos do seu projeto!
+
+# Exemplo para projeto Python:
+# *.pkl
+# data/
+# results/
+
+# Exemplo para projeto Web:
+# dist/
+# .nuxt/

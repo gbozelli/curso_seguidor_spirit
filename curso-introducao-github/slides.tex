@@ -1,0 +1,1006 @@
+\documentclass[11pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+% Pacotes
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+% Configuração de cores para código
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{red},
+    basicstyle=\ttfamily\tiny,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=bash,
+    frame=single
+}
+
+% Título e Autor
+\title{Introdução ao GitHub}
+\subtitle{Para Usuários Windows}
+\author{Seu Nome}
+\date{\today}
+\institute{Curso de Desenvolvimento}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Sumário}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+% Slide de Título
+\begin{frame}
+\titlepage
+\end{frame}
+
+% Slide de Sumário
+\begin{frame}{Sumário}
+\tableofcontents
+\end{frame}
+
+% ============================================================================
+\section{O que é GitHub?}
+% ============================================================================
+
+\begin{frame}{O que é GitHub?}
+\begin{itemize}
+    \item Plataforma baseada em nuvem para hospedar código
+    \item Usa \textbf{Git} como sistema de controle de versão
+    \item Permite colaboração entre desenvolvedores
+    \item Rastreia todas as mudanças no projeto
+    \item Oferece backup automático
+\end{itemize}
+
+\begin{center}
+    \large \textbf{Git} = Sistema local | \textbf{GitHub} = Hospedagem em nuvem
+\end{center}
+\end{frame}
+
+\begin{frame}{Por que usar GitHub?}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Vantagens Técnicas:}
+\begin{itemize}
+    \small
+    \item Controle de versão
+    \item Histórico completo
+    \item Reverter mudanças
+    \item Branches independentes
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Vantagens Profissionais:}
+\begin{itemize}
+    \small
+    \item Portfólio online
+    \item Colaboração em equipe
+    \item Comunidade ativa
+    \item Integração com ferramentas
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% ============================================================================
+\section{Conceitos Fundamentais}
+% ============================================================================
+
+\begin{frame}{Repositório (Repo)}
+\begin{itemize}
+    \item \textbf{Repositório} = Pasta de projeto com controle de versão
+    \item Contém todos os arquivos + histórico de mudanças
+    \item Pasta especial \texttt{.git} rastreia tudo
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Dois tipos:}
+\begin{itemize}
+    \item \textbf{Local}: No seu computador
+    \item \textbf{Remoto}: No GitHub (na nuvem)
+\end{itemize}
+
+\vspace{0.5cm}
+
+\begin{center}
+    Seu PC (Local) $\longleftrightarrow$ GitHub (Remoto)
+\end{center}
+\end{frame}
+
+\begin{frame}{Commit}
+\textbf{Commit} = "Salvar" uma versão do seu projeto
+
+\begin{itemize}
+    \item É como fazer um backup com anotações
+    \item Tem mensagem descritiva
+    \item Registra QUEM fez, QUANDO e O QUÊ foi feito
+    \item Cada commit tem ID único
+\end{itemize}
+
+\vspace{0.5cm}
+
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{../../../common/images/commit-timeline.png}
+\end{center}
+
+\small (Se tiver imagem disponível)
+\end{frame}
+
+\begin{frame}{Exemplo de Commit}
+\begin{lstlisting}
+commit a1b2c3d4e5f6g7h8
+Author: João Silva <joao@email.com>
+Date:   Mon May 26 10:30:00 2026
+
+    Adiciona função de login
+    
+    - Implementa autenticação de usuário
+    - Adiciona validação de senha
+    - Inclui testes unitários
+\end{lstlisting}
+
+\begin{itemize}
+    \small
+    \item \textbf{Hash}: Identificador único (a1b2c3d...)
+    \item \textbf{Author}: Quem fez
+    \item \textbf{Date}: Quando
+    \item \textbf{Mensagem}: O quê e por quê
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Branch (Ramo)}
+\textbf{Branch} = Linha de desenvolvimento independente
+
+\begin{itemize}
+    \item Trabalhe em features sem afetar o código principal
+    \item \texttt{main} é o branch principal (produção)
+    \item Crie branches como \texttt{feature/login}, \texttt{bugfix/error}
+    \item Depois mescle (merge) de volta para main
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Exemplo:}
+\begin{itemize}
+    \small
+    \item Branch \texttt{main}: Código em produção
+    \item Branch \texttt{feature/2fa}: Desenvolvendo autenticação 2FA
+    \item Quando pronto: Mescla para \texttt{main}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Visualizando Branches}
+\begin{lstlisting}
+main:           A -> B -> C -> D -> E
+                         |
+feature/login:           -> F -> G
+\end{lstlisting}
+
+\begin{itemize}
+    \item Trabalho isolado
+    \item Sem conflitos
+    \item Depois junta tudo: \texttt{git merge}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pull Request (PR)}
+\textbf{Pull Request} = Solicitação formal para mesclar código
+
+\begin{itemize}
+    \item Você abre uma PR no GitHub
+    \item Colegas \textbf{revisam} seu código
+    \item Discussão e sugestões de melhorias
+    \item Testes automatizados rodam
+    \item Após aprovação: \textbf{Merge}
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Fluxo:}
+\begin{enumerate}
+    \small
+    \item Faz mudanças no seu branch
+    \item Push para GitHub
+    \item Abre PR
+    \item Time revisa
+    \item Ajusta conforme feedback
+    \item Aprova e mergeia
+\end{enumerate}
+\end{frame}
+
+% ============================================================================
+\section{Instalação no Windows}
+% ============================================================================
+
+\begin{frame}{Instalação: Passo 1}
+\textbf{Baixar Git para Windows}
+
+\begin{enumerate}
+    \item Acesse \url{https://git-scm.com/}
+    \item Clique em \textbf{Download for Windows}
+    \item Escolha versão compatível (32 ou 64 bits)
+    \item Execute o instalador (.exe)
+\end{enumerate}
+
+\vspace{0.5cm}
+
+\begin{center}
+    \textbf{Importante:} Fazer download oficial, não de sites desconhecidos
+\end{center}
+\end{frame}
+
+\begin{frame}{Instalação: Passo 2}
+\textbf{Instalador - Componentes Recomendados}
+
+\begin{itemize}
+    \item \textbf{Git Bash} ✓ (terminal para usar Git)
+    \item \textbf{Git GUI} ✓ (interface visual)
+    \item \textbf{Windows Explorer integration} ✓ (clicar direito)
+    \item \textbf{Git Credential Manager} ✓
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Editor padrão:} Notepad ou VS Code
+
+\vspace{0.3cm}
+
+\textbf{Deixe outras opções no padrão}
+\end{frame}
+
+\begin{frame}{Instalação: Passo 3}
+\textbf{Verificar Instalação}
+
+Abra \textbf{Git Bash} ou \textbf{PowerShell}:
+
+\begin{lstlisting}
+git --version
+\end{lstlisting}
+
+Deve retornar:
+\begin{lstlisting}
+git version 2.45.0.windows.1
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{✓ Pronto! Git instalado}
+\end{frame}
+
+\begin{frame}{Conta GitHub}
+\textbf{Criar conta GitHub}
+
+\begin{enumerate}
+    \item Acesse \url{https://github.com/}
+    \item Clique em \textbf{Sign up}
+    \item Preencha dados:
+    \begin{itemize}
+        \item Email
+        \item Senha (forte!)
+        \item Username
+    \end{itemize}
+    \item Verifique seu email
+\end{enumerate}
+
+\vspace{0.3cm}
+
+\textbf{Username dicas:}
+\begin{itemize}
+    \small
+    \item Sem espaços
+    \item Sem caracteres especiais (exceto - e \_)
+    \item Profissional (é seu portfólio!)
+\end{itemize}
+\end{frame}
+
+% ============================================================================
+\section{Configuração Inicial}
+% ============================================================================
+
+\begin{frame}{Configurar Git}
+\textbf{Primeira vez usando Git?}
+
+Defina seu nome e email:
+
+\begin{lstlisting}
+git config --global user.name "João Silva"
+git config --global user.email "joao@email.com"
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Verificar:}
+\begin{lstlisting}
+git config --list
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Nota:} Use a mesma email da conta GitHub!
+\end{frame}
+
+\begin{frame}{SSH Keys (Recomendado)}
+\textbf{Por que SSH?} Não precisa digitar senha toda vez
+
+\vspace{0.3cm}
+
+\textbf{Gerar chave:}
+\begin{lstlisting}
+ssh-keygen -t ed25519 -C "seu@email.com"
+\end{lstlisting}
+
+Pressione Enter para tudo (usa padrões)
+
+\vspace{0.5cm}
+
+\textbf{Ver chave pública:}
+\begin{lstlisting}
+cat ~/.ssh/id_ed25519.pub
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+Copie a saída (começa com \texttt{ssh-ed25519})
+\end{frame}
+
+\begin{frame}{Adicionar Chave ao GitHub}
+\begin{enumerate}
+    \item Acesse \url{https://github.com/settings/keys}
+    \item Clique \textbf{New SSH key}
+    \item \textbf{Title}: "Meu Windows" (algo descritivo)
+    \item \textbf{Key}: Cole a chave copiada
+    \item Clique \textbf{Add SSH key}
+\end{enumerate}
+
+\vspace{0.5cm}
+
+\textbf{Testar conexão:}
+\begin{lstlisting}
+ssh -T git@github.com
+\end{lstlisting}
+
+Deve retornar:
+\begin{lstlisting}
+Hi username! You've successfully authenticated...
+\end{lstlisting}
+\end{frame}
+
+% ============================================================================
+\section{Fluxo Básico}
+% ============================================================================
+
+\begin{frame}{Fluxo: Criar Repositório Local}
+\textbf{Passo 1: Criar pasta e inicializar Git}
+
+\begin{lstlisting}
+mkdir meu-projeto
+cd meu-projeto
+git init
+\end{lstlisting}
+
+Cria pasta \texttt{.git} (oculta) que rastreia mudanças
+
+\vspace{0.5cm}
+
+\textbf{Passo 2: Criar alguns arquivos}
+
+\begin{lstlisting}
+echo "# Meu Projeto" > README.md
+\end{lstlisting}
+
+Ou use VS Code:
+\begin{lstlisting}
+code .
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Fluxo: Verificar Status}
+\textbf{Quais arquivos foram modificados?}
+
+\begin{lstlisting}
+git status
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+Retorna:
+\begin{lstlisting}
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	README.md
+
+nothing added to commit but untracked files present
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\textbf{Status possíveis:}
+\begin{itemize}
+    \small
+    \item \textcolor{red}{Untracked}: Arquivo novo, Git não conhece
+    \item \textcolor{red}{Modified}: Arquivo existente foi mudado
+    \item \textcolor{green}{Staged}: Pronto para commit
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fluxo: Staging Area}
+\textbf{Adicionar arquivos à "staging area"}
+
+Antes de commitar, preparamos os arquivos:
+
+\begin{lstlisting}
+git add README.md
+\end{lstlisting}
+
+Ou adicionar tudo:
+\begin{lstlisting}
+git add .
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Verificar novamente:}
+\begin{lstlisting}
+git status
+\end{lstlisting}
+
+Agora mostra em verde (pronto para commit)
+\end{frame}
+
+\begin{frame}{Fluxo: Fazer Commit}
+\textbf{Criar snapshot do projeto}
+
+\begin{lstlisting}
+git commit -m "Adiciona README inicial"
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Boa mensagem de commit:}
+\begin{itemize}
+    \item Começa com verbo no imperativo (Adiciona, Fixa, Atualiza)
+    \item Breve e descritiva
+    \item Primeira letra maiúscula
+    \item Sem ponto final
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Exemplos:}
+\begin{itemize}
+    \small
+    \item ✓ "Adiciona validação de email"
+    \item ✗ "email validation"
+    \item ✗ "fix stuff"
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fluxo: Ver Histórico}
+\textbf{Ver todos os commits}
+
+\begin{lstlisting}
+git log
+\end{lstlisting}
+
+Mostra histórico completo (pressione Q para sair)
+
+\vspace{0.3cm}
+
+\textbf{Versão resumida:}
+\begin{lstlisting}
+git log --oneline
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+Retorna algo como:
+\begin{lstlisting}
+a1b2c3d Adiciona README inicial
+f4e5d6c Adiciona .gitignore
+\end{lstlisting}
+\end{frame}
+
+% ============================================================================
+\section{Repositório Remoto}
+% ============================================================================
+
+\begin{frame}{Criar Repo no GitHub}
+\begin{enumerate}
+    \item Acesse \url{https://github.com/new}
+    \item \textbf{Repository name}: \texttt{meu-projeto}
+    \item \textbf{Description}: (opcional)
+    \item Escolha \textbf{Public} ou \textbf{Private}
+    \item \textbf{NÃO} marque "Initialize with README"
+    \item Clique \textbf{Create repository}
+\end{enumerate}
+
+\vspace{0.3cm}
+
+GitHub vai mostrar comandos para conectar seu repo local
+\end{frame}
+
+\begin{frame}{Conectar Local ao Remoto}
+\textbf{Linking seu repositório local com GitHub}
+
+\begin{lstlisting}
+git remote add origin git@github.com:seu-usuario/meu-projeto.git
+\end{lstlisting}
+
+\textbf{Renomear branch (Git moderno):}
+\begin{lstlisting}
+git branch -M main
+\end{lstlisting}
+
+\textbf{Enviar commits para GitHub:}
+\begin{lstlisting}
+git push -u origin main
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+Agora seu código está no GitHub! 🎉
+\end{frame}
+
+\begin{frame}{Depois: Atualizar}
+\textbf{Após fazer mais commits locais}
+
+Simplesmente:
+\begin{lstlisting}
+git push
+\end{lstlisting}
+
+Envia novos commits para GitHub
+
+\vspace{0.5cm}
+
+\textbf{Baixar mudanças do GitHub:}
+\begin{lstlisting}
+git pull
+\end{lstlisting}
+
+Traz commits feitos por outros em seu PC
+\end{frame}
+
+% ============================================================================
+\section{Branches e PRs}
+% ============================================================================
+
+\begin{frame}{Criar um Branch}
+\textbf{Trabalhar em uma nova feature}
+
+\begin{lstlisting}
+git checkout -b feature/login
+\end{lstlisting}
+
+Cria novo branch e muda para ele
+
+\vspace{0.5cm}
+
+\textbf{Verificar branches:}
+\begin{lstlisting}
+git branch
+\end{lstlisting}
+
+Mostra: \texttt{* feature/login} (asterisco = atual)
+
+\vspace{0.5cm}
+
+\textbf{Trocar de branch:}
+\begin{lstlisting}
+git checkout main
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Commits no Branch}
+\textbf{Trabalhe normalmente}
+
+\begin{lstlisting}
+# Editar arquivos
+# (abra no VS Code e modifique)
+
+# Adicionar e commitar
+git add .
+git commit -m "Implementa tela de login"
+git commit -m "Adiciona validação de email"
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Branch agora tem commits novos!}
+
+main fica inalterado, seguro
+\end{frame}
+
+\begin{frame}{Push do Branch}
+\textbf{Enviar branch para GitHub}
+
+\begin{lstlisting}
+git push origin feature/login
+\end{lstlisting}
+
+GitHub cria branch remoto automaticamente
+
+\vspace{0.5cm}
+
+\textbf{Ver todos os branches:}
+\begin{lstlisting}
+git branch -a
+\end{lstlisting}
+
+Mostra locais e remotos
+\end{frame}
+
+\begin{frame}{Abrir Pull Request}
+\begin{enumerate}
+    \item Acesse seu repositório no GitHub
+    \item Clique em \textbf{Pull requests}
+    \item Clique \textbf{New pull request}
+    \item Selecione:
+    \begin{itemize}
+        \item \textbf{Base}: \texttt{main}
+        \item \textbf{Compare}: \texttt{feature/login}
+    \end{itemize}
+    \item Clique \textbf{Create pull request}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Descrever a PR}
+\textbf{Preenchendo a descrição}
+
+\begin{itemize}
+    \item \textbf{Title}: Resumo da mudança
+    \item \textbf{Description}: Detalhes (use Markdown!)
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Template útil:}
+
+\begin{itemize}
+    \small
+    \item O que faz essa PR?
+    \item Por que é necessária?
+    \item Como testar?
+    \item Screenshots (se visual)
+    \item Issues relacionadas
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Revisar e Mesclar}
+\textbf{Como revisor:}
+
+\begin{itemize}
+    \item Leia descrição
+    \item Clique em \textbf{Files changed}
+    \item Deixe comentários
+    \item Aprove ou solicite mudanças
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Como autor (respondendo feedback):}
+
+\begin{lstlisting}
+git add .
+git commit -m "Implementa feedback da revisão"
+git push origin feature/login
+\end{lstlisting}
+
+PR se atualiza automaticamente
+
+\vspace{0.3cm}
+
+\textbf{Após aprovação:} Clique \textbf{Merge pull request}
+\end{frame}
+
+\begin{frame}{Depois de Mesclar}
+\textbf{Limpeza}
+
+\begin{lstlisting}
+# Voltar para main
+git checkout main
+
+# Atualizar main local
+git pull origin main
+
+# Deletar branch local
+git branch -d feature/login
+
+# Deletar branch remoto (GitHub oferece botão)
+git push origin --delete feature/login
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\textbf{Pronto! Feature integrada em produção}
+\end{frame}
+
+% ============================================================================
+\section{Comandos Essenciais}
+% ============================================================================
+
+\begin{frame}{Comandos: Consulta}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Comando} & \textbf{O que faz} \\
+\hline
+\texttt{git status} & Status atual dos arquivos \\
+\texttt{git log} & Histórico de commits \\
+\texttt{git log --oneline} & Histórico resumido \\
+\texttt{git diff} & Mudanças não commitadas \\
+\texttt{git branch} & Lista branches locais \\
+\texttt{git branch -a} & Todos os branches \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Comandos: Modificação}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Comando} & \textbf{O que faz} \\
+\hline
+\texttt{git add <file>} & Prepara arquivo \\
+\texttt{git add .} & Prepara tudo \\
+\texttt{git commit -m "msg"} & Cria commit \\
+\texttt{git reset HEAD <file>} & Remove de staging \\
+\texttt{git checkout <file>} & Descarta mudanças \\
+\hline
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Comandos: Remoto}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Comando} & \textbf{O que faz} \\
+\hline
+\texttt{git push} & Envia para GitHub \\
+\texttt{git pull} & Baixa do GitHub \\
+\texttt{git fetch} & Baixa sem mesclar \\
+\texttt{git clone <url>} & Copia repositório \\
+\texttt{git remote -v} & Ver remotes \\
+\hline
+\end{tabular}
+\end{frame}
+
+% ============================================================================
+\section{Boas Práticas}
+% ============================================================================
+
+\begin{frame}{Mensagens de Commit}
+\textbf{Bom exemplo:}
+\begin{lstlisting}
+feat: Adiciona autenticação 2FA
+
+- Implementa módulo de 2FA
+- Integra com Twilio
+- Adiciona testes
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Ruim:}
+\begin{lstlisting}
+fix
+asdfgh
+mudanças
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Prefixos úteis:}
+\begin{itemize}
+    \small
+    \item \texttt{feat:} Nova funcionalidade
+    \item \texttt{fix:} Correção
+    \item \texttt{docs:} Documentação
+    \item \texttt{refactor:} Reorganização
+    \item \texttt{test:} Testes
+\end{itemize}
+\end{frame}
+
+\begin{frame}{.gitignore}
+\textbf{Arquivo que lista o que GIT deve IGNORAR}
+
+\begin{lstlisting}
+# .gitignore
+node_modules/
+__pycache__/
+.env
+*.log
+.DS_Store
+.vscode/
+\end{lstlisting}
+
+\begin{itemize}
+    \item Não commita arquivos temporários
+    \item Não commita senhas/chaves
+    \item Não commita dependências
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estrutura de Branches}
+\textbf{Padrão comum em times:}
+
+\begin{itemize}
+    \item \texttt{main}: Produção (sempre estável)
+    \item \texttt{develop}: Integração
+    \item \texttt{feature/*}: Novas features
+    \item \texttt{bugfix/*}: Correções
+    \item \texttt{hotfix/*}: Urgente em produção
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Fluxo:}
+\begin{enumerate}
+    \small
+    \item Feature branchs saem de \texttt{develop}
+    \item PRs vão para \texttt{develop}
+    \item Periodicamente: \texttt{develop} → \texttt{main}
+\end{enumerate}
+\end{frame}
+
+% ============================================================================
+\section{Resolução de Problemas}
+% ============================================================================
+
+\begin{frame}{Problema: SSH Permission Denied}
+\textbf{Erro: "Permission denied (publickey)"}
+
+\begin{lstlisting}
+# Testar SSH
+ssh -T git@github.com
+
+# Adicionar chave ao ssh-agent
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+# Testar novamente
+ssh -T git@github.com
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+Se ainda falhar: Reconfigurar SSH (ver README)
+\end{frame}
+
+\begin{frame}{Problema: Mensagem de Commit Errada}
+\textbf{Corrigir último commit}
+
+\begin{lstlisting}
+git commit --amend -m "Nova mensagem"
+\end{lstlisting}
+
+\vspace{0.5cm}
+
+\textbf{Incluir arquivo esquecido:}
+
+\begin{lstlisting}
+git add arquivo-esquecido.txt
+git commit --amend --no-edit
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\textbf{Cuidado:} Só faça antes de fazer push!
+\end{frame}
+
+\begin{frame}{Problema: Merge Conflict}
+\textbf{Quando dois branches modificam mesma linha}
+
+Git vai avisar:
+\begin{lstlisting}
+CONFLICT (content merge): Merge conflict in arquivo.txt
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\textbf{Ver conflito:}
+\begin{lstlisting}
+<<<<<<< HEAD
+seu código
+=======
+código outro
+>>>>>>> branch
+\end{lstlisting}
+
+Escolha qual código manter, salve, e:
+\begin{lstlisting}
+git add arquivo.txt
+git commit -m "Resolve merge conflict"
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Problema: Não é um Git Repo}
+\textbf{Erro: "fatal: not a git repository"}
+
+Você está fora do repositório
+
+\vspace{0.3cm}
+
+\textbf{Solução:}
+\begin{lstlisting}
+# Navegue para pasta correta
+cd caminho/do/repositorio
+
+# Ou inicie novo repo
+git init
+\end{lstlisting}
+\end{frame}
+
+% ============================================================================
+\section{Próximos Passos}
+% ============================================================================
+
+\begin{frame}{Próximos Passos}
+\begin{enumerate}
+    \item \textbf{Configure Git} no seu Windows
+    \item \textbf{Crie uma conta} GitHub
+    \item \textbf{Clone um projeto} existente
+    \item \textbf{Crie seu primeiro repo} pessoal
+    \item \textbf{Pratique} commits, branches, PRs
+    \item \textbf{Contribua} em projetos open-source
+\end{enumerate}
+
+\vspace{0.5cm}
+
+Confira o README.md para mais detalhes!
+\end{frame}
+
+\begin{frame}{Recursos Úteis}
+\begin{itemize}
+    \item \url{https://git-scm.com/doc} - Documentação oficial Git
+    \item \url{https://docs.github.com} - Documentação GitHub
+    \item \url{https://learngitbranching.js.org} - Aprender Git interativamente
+    \item \url{https://skills.github.com} - Tutoriais oficiais GitHub
+\end{itemize}
+
+\vspace{0.5cm}
+
+\begin{center}
+    \Large \textbf{Dúvidas?}
+    
+    \vspace{0.3cm}
+    
+    Abra uma issue no repositório!
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+    \Huge \textbf{Obrigado!}
+    
+    \vspace{0.5cm}
+    
+    \Large Bom aprendizado com Git e GitHub! 🚀
+\end{center}
+\end{frame}
+
+\end{document}
