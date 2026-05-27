@@ -397,6 +397,216 @@ void loop() {
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Modularização: Além de Funções}
+  \begin{itemize}
+    \item À medida que o código cresce (centenas ou milhares de linhas), organizar tudo em um único arquivo `.ino` fica impossível.
+    \item A solução é \textbf{separar o código em múltiplos arquivos}, cada um com uma responsabilidade.
+    \item Exemplo de um seguidor de linha modularizado:
+    \begin{itemize}
+      \item `config.h` → constantes, pinos, parâmetros globais.
+      \item `motor.h` / `motor.cpp` → tudo sobre controle de motores.
+      \item `sensores.h` / `sensores.cpp` → leitura e processamento de sensores.
+      \item `pid.h` / `pid.cpp` → cálculo do algoritmo PID.
+      \item `bluetooth.h` / `bluetooth.cpp` → comunicação sem fio.
+    \end{itemize}
+    \item Cada módulo é \textbf{independente} e pode ser testado isoladamente.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Arquivos `.h` (Header) - Declarações}
+\begin{lstlisting}
+// motor.h
+#ifndef MOTOR_H
+#define MOTOR_H
+
+#include <Arduino.h>
+
+void inicializarMotor();
+void pararMotores();
+void controlarMotor(int velEsq, int velDir);
+
+#endif
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Arquivo `.h` contém \textbf{declarações} e \textbf{protótipos} de funções.
+    \item `#ifndef` / `#define` / `#endif` previnem inclusão duplicada (include guards).
+    \item É o contrato: aqui está o que o módulo oferece.
+    \item Quem quer usar motor, inclui `motor.h` e pronto.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Arquivos `.cpp` - Implementação}
+\begin{lstlisting}
+// motor.cpp
+#include "motor.h"
+#include "config.h"
+
+void inicializarMotor() {
+  for (int i = 0; i < 4; i++) {
+    pinMode(MOTOR_PINS[i], OUTPUT);
+  }
+  pararMotores();
+}
+
+void pararMotores() {
+  analogWrite(PWM_LEFT, 0);
+  analogWrite(PWM_RIGHT, 0);
+}
+
+void controlarMotor(int velEsq, int velDir) {
+  analogWrite(PWM_LEFT, velEsq);
+  analogWrite(PWM_RIGHT, velDir);
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Arquivo `.cpp` contém a \textbf{implementação} (o código real).
+    \item Inclui o `.h` correspondente (para ter acesso às declarações).
+    \item Pode incluir outros módulos (`config.h`, `sensores.h`, etc.) conforme necessário.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Organização em Pastas}
+  Estrutura típica de um projeto modularizado:
+\begin{lstlisting}
+meu_seguidor/
+├── meu_seguidor.ino (setup() e loop())
+└── src/
+    ├── config/
+    │   └── config.h (constantes e pinos)
+    ├── motor/
+    │   ├── motor.h
+    │   └── motor.cpp
+    ├── sensores/
+    │   ├── sensores.h
+    │   └── sensores.cpp
+    ├── pid/
+    │   ├── pid.h
+    │   └── pid.cpp
+    └── bluetooth/
+        ├── bluetooth.h
+        └── bluetooth.cpp
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Cada módulo em sua própria pasta.
+    \item `config.h` centraliza \textbf{todas} as constantes (pinos, velocidades, parâmetros).
+    \item Muito fácil de encontrar e editar um componente específico.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{O arquivo `config.h`}
+\begin{lstlisting}
+// config.h - Centraliza TODAS as constantes
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// Pinos
+const int LED_PIN = 22;
+const int PWM_LEFT = 21;
+const int PWM_RIGHT = 2;
+const int MOTOR_PINS[] = {18, 19, 5, 4};
+
+// Parâmetros PID
+float KP = 0.5;
+float KD = 0.4;
+
+// Velocidade
+int VEL_MAX = 80;
+
+// Estados globais
+bool start = false;
+bool linhaPerdida = false;
+
+// Timing
+unsigned long lastLoopTime = 0;
+const unsigned long loopInterval = 30;
+
+#endif
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Todos os módulos incluem `config.h` para acessar constantes.
+    \item Se você quer mudar um pino, muda em um lugar só.
+    \item Evita replicação de código (DRY: Don't Repeat Yourself).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Incluindo Módulos no `.ino`}
+\begin{lstlisting}
+// meu_seguidor.ino
+#include "src/config/config.h"
+#include "src/motor/motor.h"
+#include "src/sensores/sensores.h"
+#include "src/pid/pid.h"
+#include "src/bluetooth/bluetooth.h"
+
+void setup() {
+  Serial.begin(115200);
+  inicializarMotor();
+  inicializarSensores();
+  inicializarBluetooth();
+}
+
+void loop() {
+  processarComandosBT();
+  
+  if (millis() - lastLoopTime < loopInterval) return;
+  lastLoopTime = millis();
+  
+  lerSensoresQTR();
+  if (!verificarLinhaPerdida() && start) {
+    calcularPID();
+  } else {
+    pararMotores();
+  }
+}
+\end{lstlisting}
+
+  \begin{itemize}
+    \item Arquivo `.ino` inclui todos os módulos que precisa.
+    \item `setup()` e `loop()` ficam simples e legíveis.
+    \item Cada função vem de seu respectivo módulo.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Benefícios da Modularização}
+  \begin{itemize}
+    \item \textbf{Legibilidade}: código organizado e fácil de navegar.
+    \item \textbf{Manutenibilidade}: problema em motor? Vai direto em `motor.cpp`.
+    \item \textbf{Reutilização}: use `motor.h` e `motor.cpp` em outro projeto.
+    \item \textbf{Testes}: teste cada módulo isoladamente antes de integrar.
+    \item \textbf{Trabalho em equipe}: um desenvolve `motor.cpp`, outro `sensores.cpp`, sem conflitos.
+    \item \textbf{Escalabilidade}: adicione novos módulos (LED, buzzer, LoRa) sem mexer no código existente.
+    \item \textbf{Performance}: o compilador só inclui o código que você realmente usa.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Anti-padrão: Sem Modularização}
+\begin{lstlisting}
+// ❌ RUIM: tudo em um arquivo de 1000+ linhas
+void setup() {
+  // ... 50 linhas de inicialização ...
+}
+
+void loop() {
+  // ... 200 linhas de código misturado ...
+  // sensores, cálculos, motor, BT... tudo aqui!
+}
+
+// ... 50 funções espalhadas sem organização ...
+\end{lstlisting}
+
+  Consequências:
+  \begin{itemize}
+    \item Difícil encontrar uma função específica.
+    \item Um bug pode estar em qualquer lugar.
+    \item Impossível reutilizar código em outro projeto.
+    \item Trabalhar em equipe é muito difícil.
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Resumo: Estrutura de um Bom Programa}
   \begin{enumerate}
     \item \textbf{Defina estruturas} para agrupar dados relacionados (Motor, Sensor).
@@ -405,12 +615,14 @@ void loop() {
     \item \textbf{Mantenha o \texttt{loop()} limpo}: apenas chamadas de função.
     \item \textbf{Teste isoladamente}: valide cada função antes de integrar.
     \item \textbf{Evite \texttt{delay()}}: use `millis()` para tarefas periódicas.
+    \item \textbf{Modularize com arquivos}: separe em `.h` / `.cpp` e organize em pastas.
   \end{enumerate}
   
   \begin{itemize}
     \item Um programa estruturado assim fica fácil de entender, manter e depurar.
     \item Você consegue trabalhar em equipe sem conflitos.
-    \item Adicionar novos recursos (como LED de status, comunicação LoRa) é trivial.
+    \item Adicionar novos recursos é trivial.
+    \item Seu código fica profissional e reutilizável.
   \end{itemize}
 \end{frame}
 
