@@ -1,0 +1,642 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf-8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{xspace}
+
+% Configuração de código
+\lstset{
+    language=C,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    tabsize=4,
+    showstringspaces=false,
+    framexleftmargin=5pt,
+    framerule=0.5pt,
+    backgroundcolor=\color{lightgray!10},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    xleftmargin=15pt
+}
+
+% Estilos de página
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Testes Unitários em C/C++ para Arduino}
+\lhead{Curso Seguidor Spirit}
+\rfoot{\thepage}
+\lfoot{\today}
+
+\title{
+    \Huge \textbf{Testes Unitários em C/C++ para Arduino} \\
+    \large Guia Completo para Testes no Projeto Seguidor
+}
+\author{Bozelli}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+% ========== SEÇÃO 1 ==========
+\section{Introdução}
+
+Testes unitários são um componente crítico no desenvolvimento de software embarcado.
+Especialmente em projetos Arduino, onde o ciclo de feedback é lento (recompilação $\rightarrow$ upload $\rightarrow$ teste físico),
+testes automatizados podem economizar horas de desenvolvimento.
+
+Este documento apresenta um guia prático e completo para implementar testes unitários 
+em C/C++ para o projeto do robô seguidor. O foco é na simplicidade e aplicabilidade real.
+
+\subsection{O que você aprenderá}
+
+\begin{itemize}
+    \item Conceitos fundamentais de testes unitários
+    \item Por que testar é importante em sistemas embarcados
+    \item Como escolher o framework certo (Unity)
+    \item Setup completo do ambiente de testes
+    \item Boas práticas para escrita de testes
+    \item Integração com CI/CD
+\end{itemize}
+
+% ========== SEÇÃO 2 ==========
+\section{Conceitos Básicos}
+
+\subsection{Definição}
+
+Um \textbf{teste unitário} é um teste pequeno e focado que verifica se uma função ou módulo 
+funciona corretamente de forma isolada.
+
+\begin{lstlisting}[caption=Exemplo básico de teste unitário]
+void test_somar_dois_numeros(void) {
+    int resultado = somar(2, 3);
+    TEST_ASSERT_EQUAL_INT(5, resultado);
+}
+\end{lstlisting}
+
+\subsection{Características de um bom teste}
+
+Um teste unitário deve ter as seguintes características:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\toprule
+\textbf{Característica} & \textbf{Descrição} \\
+\midrule
+Uma responsabilidade & Testa apenas uma coisa \\
+Nome descritivo & Deixa claro o que testa \\
+Isolado & Não depende de outros testes \\
+Rápido & Executa em milissegundos \\
+Determinístico & Sempre passa ou falha (não muda) \\
+\bottomrule
+\end{tabular}
+\caption{Características de um bom teste unitário}
+\end{table}
+
+\subsection{Padrão Arrange-Act-Assert}
+
+Todo teste bem estruturado segue este padrão de três seções:
+
+\begin{lstlisting}[caption=Padrão AAA - Arrange-Act-Assert]
+void test_motor_velocidade_limitada(void) {
+    // ARRANGE: Preparar estado
+    inicializarMotor();
+    
+    // ACT: Executar a função
+    controlarMotor(500, 500);  // Tenta acima do máximo
+    
+    // ASSERT: Verificar resultado
+    TEST_ASSERT_LESS_THAN_OR_EQUAL(255, getVelocidade());
+}
+\end{lstlisting}
+
+% ========== SEÇÃO 3 ==========
+\section{Por Que Testar?}
+
+\subsection{Problemas sem testes}
+
+Sem testes unitários, você enfrenta vários problemas:
+
+\begin{itemize}
+    \item \textbf{Debugging demorado:} Descobrir bugs apenas após carregar no hardware
+    \item \textbf{Refatoração arriscada:} Medo de quebrar algo ao modificar código
+    \item \textbf{Ciclo lento:} Recompile $\rightarrow$ Upload $\rightarrow$ Teste $\rightarrow$ Repita
+    \item \textbf{Documentação ruim:} Incerteza sobre como as funções devem funcionar
+\end{itemize}
+
+\subsection{Vantagens com testes}
+
+Com testes unitários implementados:
+
+\begin{itemize}
+    \item \textbf{Feedback instantâneo:} Testes rodam em segundos no computador
+    \item \textbf{Confiança para refatorar:} Mude código sabendo que testes validam
+    \item \textbf{Documentação viva:} Testes mostram exatamente como usar cada função
+    \item \textbf{Bugs detectados cedo:} Antes de enviar ao hardware
+\end{itemize}
+
+\subsection{Comparação de tempo}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\toprule
+\textbf{Tarefa} & \textbf{Sem Testes} & \textbf{Com Testes} \\
+\midrule
+Escrever código & 5 min & 5 min \\
+Testar mudanças & 5 min & 0,1 min \\
+Debugar & 10 min & 0,5 min \\
+Total & \textbf{20 min} & \textbf{5,6 min} \\
+\bottomrule
+\end{tabular}
+\caption{Comparação de tempo: com vs sem testes}
+\end{table}
+
+% ========== SEÇÃO 4 ==========
+\section{Frameworks de Teste}
+
+\subsection{Comparação de frameworks}
+
+Existem vários frameworks de teste para C/C++. A escolha depende do projeto:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\toprule
+\textbf{Framework} & \textbf{Melhor para} & \textbf{Tamanho} & \textbf{Dificuldade} & \textbf{C puro} \\
+\midrule
+Unity & Embarcados & Pequeno & Fácil & Sim \\
+ArduinoUnit & Arduino IDE & Pequeno & Fácil & Sim \\
+Google Test & Projetos grandes & Grande & Difícil & Não \\
+CppUTest & C/C++ embarcado & Médio & Médio & Sim \\
+\bottomrule
+\end{tabular}
+\caption{Comparação de frameworks de teste}
+\end{table}
+
+\subsection{Por que Unity?}
+
+Para o projeto do seguidor, escolhemos \textbf{Unity} pelos seguintes motivos:
+
+\begin{enumerate}
+    \item \textbf{Leve:} Apenas $\sim$700 linhas de código
+    \item \textbf{Simples:} Aprende em 5 minutos
+    \item \textbf{C puro:} Compatível com código Arduino
+    \item \textbf{Multiplataforma:} Windows, Linux, Mac
+    \item \textbf{Sem dependências:} Funciona em qualquer lugar
+\end{enumerate}
+
+% ========== SEÇÃO 5 ==========
+\section{Setup do Unity}
+
+\subsection{Passo 1: Baixar Unity}
+
+\begin{lstlisting}[language=bash, caption=Baixar Unity via Git]
+cd seguidor-projeto
+mkdir -p test
+cd test
+git clone https://github.com/ThrowTheSwitch/Unity.git
+\end{lstlisting}
+
+\subsection{Passo 2: Estrutura de pastas}
+
+O projeto deve ficar organizado assim:
+
+\begin{lstlisting}[language=bash, caption=Estrutura recomendada]
+seguidor-projeto/
+├── src/
+│   ├── motor/
+│   │   ├── motor.h
+│   │   └── motor.c
+│   ├── pid/
+│   │   ├── pid.h
+│   │   └── pid.c
+│   ├── sensores/
+│   │   ├── sensores.h
+│   │   └── sensores.c
+│   └── config/
+│       └── config.h
+├── test/
+│   ├── Unity/          # Framework (git clone)
+│   ├── mock_arduino.h  # Simulações
+│   ├── mock_arduino.c
+│   ├── test_motor.c    # Testes
+│   ├── test_pid.c
+│   └── run_tests.sh    # Script
+└── README.md
+\end{lstlisting}
+
+\subsection{Passo 3: Mock do Arduino}
+
+Como os testes rodam no computador (não no Arduino), você precisa simular as funções do Arduino.
+
+\begin{lstlisting}[caption=mock\_arduino.h - Interface dos mocks]
+#ifndef MOCK_ARDUINO_H
+#define MOCK_ARDUINO_H
+
+#define HIGH 1
+#define LOW 0
+#define OUTPUT 1
+#define INPUT 0
+
+typedef struct {
+    int pinMode_calls;
+    int digitalWrite_calls;
+    int ledcWrite_calls;
+} MockState;
+
+extern MockState mock_state;
+
+void resetMocks(void);
+void pinMode(int pin, int mode);
+void digitalWrite(int pin, int value);
+void ledcWrite(int channel, int value);
+
+#endif
+\end{lstlisting}
+
+\begin{lstlisting}[caption=mock\_arduino.c - Implementação dos mocks]
+#include "mock_arduino.h"
+
+MockState mock_state = {0};
+
+void resetMocks(void) {
+    mock_state.pinMode_calls = 0;
+    mock_state.digitalWrite_calls = 0;
+    mock_state.ledcWrite_calls = 0;
+}
+
+void pinMode(int pin, int mode) {
+    mock_state.pinMode_calls++;
+}
+
+void digitalWrite(int pin, int value) {
+    mock_state.digitalWrite_calls++;
+}
+
+void ledcWrite(int channel, int value) {
+    mock_state.ledcWrite_calls++;
+}
+\end{lstlisting}
+
+% ========== SEÇÃO 6 ==========
+\section{Suite de Testes Prática}
+
+\subsection{Estrutura geral}
+
+\begin{lstlisting}[caption=Estrutura básica de um arquivo de teste]
+#include "unity.h"
+#include "mock_arduino.h"
+#include "../src/motor/motor.h"
+
+void setUp(void) {
+    // Executado ANTES de cada teste
+    resetMocks();
+    inicializarMotor();
+}
+
+void tearDown(void) {
+    // Executado DEPOIS de cada teste
+    pararMotores();
+}
+
+void test_motor_inicializa(void) {
+    TEST_ASSERT_GREATER_THAN(0, mock_state.pinMode_calls);
+}
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_motor_inicializa);
+    return UNITY_END();
+}
+\end{lstlisting}
+
+\subsection{Exemplo completo: Testes do Motor}
+
+Vamos testar um módulo de motor com velocidade limitada entre 0-255:
+
+\begin{lstlisting}[caption=test\_motor.c - Suite completa de testes]
+#include "unity.h"
+#include "mock_arduino.h"
+#include "../src/motor/motor.h"
+
+void setUp(void) {
+    resetMocks();
+    inicializarMotor();
+}
+
+void tearDown(void) {
+    pararMotores();
+}
+
+// Testes de velocidade normal
+void test_velocidade_50(void) {
+    controlarMotor(50, 50);
+    TEST_ASSERT_EQUAL_INT(50, getVelocidadeMotorEsquerdo());
+}
+
+// Teste de velocidade acima do máximo
+void test_velocidade_acima_maximo(void) {
+    controlarMotor(500, 500);
+    TEST_ASSERT_LESS_THAN_OR_EQUAL(255, 
+        getVelocidadeMotorEsquerdo());
+}
+
+// Teste de velocidade negativa
+void test_velocidade_negativa(void) {
+    controlarMotor(-50, -50);
+    TEST_ASSERT_EQUAL_INT(0, getVelocidadeMotorEsquerdo());
+}
+
+// Teste de independência dos motores
+void test_motores_independentes(void) {
+    controlarMotor(100, 200);
+    TEST_ASSERT_EQUAL_INT(100, 
+        getVelocidadeMotorEsquerdo());
+    TEST_ASSERT_EQUAL_INT(200, 
+        getVelocidadeMotorDireito());
+}
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_velocidade_50);
+    RUN_TEST(test_velocidade_acima_maximo);
+    RUN_TEST(test_velocidade_negativa);
+    RUN_TEST(test_motores_independentes);
+    return UNITY_END();
+}
+\end{lstlisting}
+
+\subsection{Resultado esperado}
+
+\begin{lstlisting}[language=bash, caption=Saída dos testes]
+test_velocidade_50...PASS
+test_velocidade_acima_maximo...PASS
+test_velocidade_negativa...PASS
+test_motores_independentes...PASS
+
+-----------------------
+4 Tests 4 Passed 0 Failed
+-----------------------
+\end{lstlisting}
+
+% ========== SEÇÃO 7 ==========
+\section{Boas Práticas}
+
+\subsection{1. Um conceito por teste}
+
+Cada teste deve verificar apenas uma coisa. Se falhar, você sabe exatamente o quê quebrou.
+
+\begin{lstlisting}[caption=Errado vs Correto]
+// ERRADO: Múltiplos conceitos
+void test_motor(void) {
+    controlarMotor(100, 100);
+    TEST_ASSERT_EQUAL_INT(100, getVelocidade());
+    pararMotores();
+    TEST_ASSERT_EQUAL_INT(0, getVelocidade());
+}
+
+// CORRETO: Um conceito por teste
+void test_motor_controla_velocidade(void) {
+    controlarMotor(100, 100);
+    TEST_ASSERT_EQUAL_INT(100, getVelocidade());
+}
+
+void test_motor_para_com_sucesso(void) {
+    pararMotores();
+    TEST_ASSERT_EQUAL_INT(0, getVelocidade());
+}
+\end{lstlisting}
+
+\subsection{2. Nomes descritivos}
+
+Nomes de testes devem descrever exatamente o que testam.
+
+\begin{lstlisting}[caption=Nomes de testes]
+// Ruim
+void test1(void) { }
+void test_motor(void) { }
+
+// Bom
+void test_motor_limita_velocidade_em_255(void) { }
+void test_motor_para_ambos_motores_com_sucesso(void) { }
+\end{lstlisting}
+
+\subsection{3. Teste casos extremos}
+
+Sempre teste limites: mínimo, máximo, negativo, overflow.
+
+\begin{lstlisting}[caption=Cobertura de casos extremos]
+void test_velocidade_minima(void) {
+    controlarMotor(0, 0);
+    TEST_ASSERT_EQUAL_INT(0, getVelocidade());
+}
+
+void test_velocidade_maxima(void) {
+    controlarMotor(255, 255);
+    TEST_ASSERT_EQUAL_INT(255, getVelocidade());
+}
+
+void test_velocidade_overflow(void) {
+    controlarMotor(256, 256);
+    TEST_ASSERT_LESS_THAN_OR_EQUAL(255, getVelocidade());
+}
+\end{lstlisting}
+
+\subsection{4. Use setUp() e tearDown()}
+
+Evite código repetido usando estas funções:
+
+\begin{lstlisting}[caption=setUp e tearDown]
+void setUp(void) {
+    // Executado ANTES de cada teste
+    // Use para inicializar estado comum
+    resetMocks();
+    inicializarMotor();
+}
+
+void tearDown(void) {
+    // Executado DEPOIS de cada teste
+    // Use para limpar recursos
+    pararMotores();
+}
+\end{lstlisting}
+
+% ========== SEÇÃO 8 ==========
+\section{Executando Testes}
+
+\subsection{Opção 1: Compilação manual}
+
+\begin{lstlisting}[language=bash, caption=Compilar manualmente]
+cd test
+gcc -I. -I../src -DTEST \
+    test_motor.c \
+    ../src/motor/motor.c \
+    mock_arduino.c \
+    Unity/src/unity.c \
+    -o test_motor
+
+./test_motor
+\end{lstlisting}
+
+\subsection{Opção 2: Script bash}
+
+\begin{lstlisting}[language=bash, caption=run\_tests.sh - Automatizar testes]
+#!/bin/bash
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$DIR"
+
+echo "Compilando testes..."
+gcc -I. -I../src -DTEST \
+    test_motor.c \
+    ../src/motor/motor.c \
+    mock_arduino.c \
+    Unity/src/unity.c \
+    -o test_motor
+
+if [ $? -ne 0 ]; then
+    echo "Erro ao compilar"
+    exit 1
+fi
+
+echo "Rodando testes..."
+./test_motor
+\end{lstlisting}
+
+Use com:
+\begin{lstlisting}[language=bash]
+chmod +x test/run_tests.sh
+./test/run_tests.sh
+\end{lstlisting}
+
+\subsection{Opção 3: CMake}
+
+Para projetos maiores, use CMake:
+
+\begin{lstlisting}[caption=CMakeLists.txt]
+cmake_minimum_required(VERSION 3.10)
+project(SeguidorTests)
+
+add_library(unity STATIC Unity/src/unity.c)
+target_include_directories(unity PUBLIC Unity/src)
+
+function(add_test_suite name file)
+    add_executable(${name} ${file} 
+        ../src/motor/motor.c
+        mock_arduino.c
+    )
+    target_include_directories(${name} PRIVATE . ../src)
+    target_link_libraries(${name} unity)
+    add_test(NAME ${name} COMMAND ${name})
+endfunction()
+
+add_test_suite(test_motor test_motor.c)
+enable_testing()
+\end{lstlisting}
+
+Use com:
+\begin{lstlisting}[language=bash]
+cd test/build
+cmake ..
+make
+make test
+\end{lstlisting}
+
+% ========== SEÇÃO 9 ==========
+\section{Integração com Git e CI/CD}
+
+\subsection{GitHub Actions}
+
+Configure testes automáticos a cada push:
+
+\begin{lstlisting}[language=yaml, caption=.github/workflows/tests.yml]
+name: Unit Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Run tests
+      run: |
+        cd test
+        mkdir -p build
+        cd build
+        cmake ..
+        make
+        make test
+\end{lstlisting}
+
+Agora, a cada push, os testes rodam automaticamente.
+
+\subsection{Checklist pré-commit}
+
+\begin{lstlisting}[language=bash, caption=.git/hooks/pre-commit]
+#!/bin/bash
+echo "Rodando testes..."
+./test/run_tests.sh
+
+if [ $? -ne 0 ]; then
+    echo "Testes falharam! Commit cancelado."
+    exit 1
+fi
+\end{lstlisting}
+
+% ========== SEÇÃO 10 ==========
+\section{Resumo}
+
+\subsection{Checklist para implementar testes}
+
+\begin{enumerate}
+    \item[\checkmark] Baixe e configure Unity
+    \item[\checkmark] Estruture pastas (src/, test/)
+    \item[\checkmark] Crie mock\_arduino.h e mock\_arduino.c
+    \item[\checkmark] Escreva testes para cada módulo
+    \item[\checkmark] Siga padrão AAA (Arrange-Act-Assert)
+    \item[\checkmark] Use nomes descritivos
+    \item[\checkmark] Teste casos extremos
+    \item[\checkmark] Configure script de testes
+    \item[\checkmark] Integre com git (hooks ou CI/CD)
+\end{enumerate}
+
+\subsection{Próximos passos}
+
+\begin{itemize}
+    \item Teste cada módulo: motor, sensores, PID, Bluetooth
+    \item Crie mocks mais avançados conforme necessário
+    \item Configure CI/CD para rodar testes automaticamente
+    \item Documente padrões de teste no projeto
+\end{itemize}
+
+\subsection{Referências}
+
+\begin{itemize}
+    \item Unity Documentation: \url{https://github.com/ThrowTheSwitch/Unity}
+    \item Test-Driven Development for Embedded C (Pragmatic Programmers)
+    \item Arduino Best Practices
+\end{itemize}
+
+\end{document}
